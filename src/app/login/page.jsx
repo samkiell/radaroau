@@ -73,7 +73,24 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen w-full flex bg-[#0A0A14]">
-      {/* Left Side - Form */}
+
+            {/* left Side - Image */}
+      <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1568289523939-61125d216fe5?q=80&w=436&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
+            filter: "grayscale(30%)",
+          }}
+        />
+        <div className="relative z-10  w-[40%] flex items-center justify-center">
+          <img
+            alt="Center Image"
+            src='assets/image 2 (1).png'
+          />
+        </div>
+      </div>
+      {/* Right Side - Form */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -230,23 +247,6 @@ const LoginPage = () => {
           </div>
         </div>
       </motion.div>
-
-      {/* Right Side - Image */}
-      <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center z-0 opacity-40"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1568289523939-61125d216fe5?q=80&w=436&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
-            filter: "grayscale(30%)",
-          }}
-        />
-        <div className="relative z-10 flex items-center justify-center">
-          <img
-            alt="Center Image"
-            src='assets/image 2 (1).png'
-          />
-        </div>
-      </div>
     </div>
   )
 }
