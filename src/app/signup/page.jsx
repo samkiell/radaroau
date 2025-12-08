@@ -7,7 +7,7 @@ import { motion, } from 'framer-motion'
 import toast from 'react-hot-toast'
 import api from "../../lib/axios";
 import useAuthStore from "../../store/authStore";
-import { Mail, Lock, User, Briefcase, Hash, Eye, EyeOff, UsersIcon,Check, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, Briefcase, Hash, Eye, EyeOff, UsersIcon, Loader2, ArrowRight } from "lucide-react";
 
 const SignUp = () => {
   const router = useRouter();
@@ -23,15 +23,12 @@ const SignUp = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
   const [organisationName, setOrganisationName] = useState("");
   const [organisationType, setOrganisationType] = useState("");
   const [organiserEmail, setOrganiserEmail] = useState("");
   const [organiserPassword, setOrganiserPassword] = useState("");
   const [organiserConfirm, setOrganiserConfirm] = useState("");
-
-  const [errors, setErrors] = useState({});
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -127,8 +124,11 @@ const SignUp = () => {
         </div>
       </div>
 
-
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 lg:px-16 xl:px-24 overflow-y-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 lg:px-16 xl:px-24 overflow-y-auto">
         <div className="w-full max-w-md">
           <div className="text-[#FF3A66] text-3xl font-bold mb-8 text-center">
             Logo
@@ -181,14 +181,14 @@ const SignUp = () => {
                         placeholder="e.g. John Christopher"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                   </div>
 
                   {/* DEPARTMENT */}
                   <div>
-                    <label className="block text-white/80 text-xs font-semibold  tracking-wide mb-2">
+                    <label className="block text-white/80 text-xs font-semibold uppercase tracking-wide mb-2">
                       Department
                     </label>
                     <div className="relative">
@@ -200,14 +200,14 @@ const SignUp = () => {
                         placeholder="e.g. Computer Science"
                         value={department}
                         onChange={(e) => setDepartment(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                   </div>
 
                   {/* MATRIC — student only */}
                   <div>
-                    <label className="block text-white/80 text-xs font-semibold  tracking-wide mb-2">
+                    <label className="block text-white/80 text-xs font-semibold uppercase tracking-wide mb-2">
                       Matric Number
                     </label>
                     <div className="relative">
@@ -219,7 +219,7 @@ const SignUp = () => {
                         placeholder="e.g. CSC/2024/057"
                         value={matric}
                         onChange={(e) => setMatric(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                   </div>
@@ -238,7 +238,7 @@ const SignUp = () => {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                     {invalidEmail && (
@@ -262,7 +262,7 @@ const SignUp = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                       <button
                         type="button"
@@ -291,7 +291,7 @@ const SignUp = () => {
                         placeholder="••••••••"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                       <button
                         type="button"
@@ -327,7 +327,7 @@ const SignUp = () => {
                         placeholder="e.g. Campus Tech Club"
                         value={organisationName}
                         onChange={(e) => setOrganisationName(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                   </div>
@@ -344,7 +344,7 @@ const SignUp = () => {
                         placeholder="e.g. Non-profit / Student Society"
                         value={organisationType}
                         onChange={(e) => setOrganisationType(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                   </div>
@@ -363,7 +363,7 @@ const SignUp = () => {
                         placeholder="Enter organisation email"
                         value={organiserEmail}
                         onChange={(e) => setOrganiserEmail(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
                     {invalidOrganiserEmail && (
@@ -387,7 +387,7 @@ const SignUp = () => {
                         placeholder="••••••••"
                         value={organiserPassword}
                         onChange={(e) => setOrganiserPassword(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                       <button
                         type="button"
@@ -411,7 +411,7 @@ const SignUp = () => {
                         placeholder="••••••••"
                         value={organiserConfirm}
                         onChange={(e) => setOrganiserConfirm(e.target.value)}
-                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-white/40 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
+                        className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-12 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                       <button
                         type="button"
@@ -434,27 +434,6 @@ const SignUp = () => {
                   </div>
                 </>
               )}
-
-              {/* --- Remember Me --- */}
-              <div className="flex items-center gap-2 pb-0.5">
-                <button
-                  type="button"
-                  onClick={() => setRememberMe(!rememberMe)}
-                  className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${
-                    rememberMe
-                      ? "bg-[#FF2E63] border-[#FF2E63]"
-                      : "bg-transparent border-gray-500"
-                  }`}
-                >
-                  {rememberMe && <Check size={14} className="text-white" />}
-                </button>
-                <label
-                  className="text-sm text-gray-300 cursor-pointer select-none"
-                  onClick={() => setRememberMe(!rememberMe)}
-                >
-                  Remember me
-                </label>
-              </div>
             </div>
 
             <button
@@ -462,7 +441,7 @@ const SignUp = () => {
            disabled={loading || !isFormValid()}
           className={`w-[80%] mx-auto bg-[#FF3A66] ${isFormValid() ? 'hover:bg-[#cf153e]' : ''} text-[#FFFFFF] font-semibold py-4 rounded-full mt-6 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed`}
         >
-            {loading ? <Loader2 className="animate-spin" /> : 'Create Account'}
+            {loading ? (<><Loader2 className="animate-spin mr-2" />Creating account...</>) : 'Create Account'}
            {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
         </button>
 
@@ -509,7 +488,7 @@ const SignUp = () => {
             </p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
