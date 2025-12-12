@@ -79,10 +79,12 @@ const SignUp = () => {
         };
       }
 
-      const res = await api.post("/auth/signup", payload); 
+      const res = await api.post("/student/signup/", payload);
       loginUser(res.data.user, res.data.token);
-      toast.success('Account Created Successfully')
-      router.push("/dashboard");
+      toast.success('Account Created Successfully. Please verify your email.')
+      // Redirect to OTP verification page for both students and organizers
+      const userEmail = role === "Student" ? email : organiserEmail;
+      router.push(`/verify-otp?email=${userEmail}`);
     } catch (err) {
       toast.error(err.response?.data?.message || "Signup failed.");
     } finally {
@@ -210,7 +212,7 @@ const SignUp = () => {
                   {/* EMAIL */}
                   <div>
                     <label className="block text-white/80 text-xs font-semibold uppercase tracking-wide mb-2">
-                      Email
+                      Student Email
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
@@ -218,7 +220,7 @@ const SignUp = () => {
                         type="email"
                           id="email"
                         name="email"
-                        placeholder="Enter your email"
+                        placeholder="your.name@student.edu.ng"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
@@ -226,7 +228,7 @@ const SignUp = () => {
                     </div>
                     {invalidEmail && (
                       <p className="text-red-500 text-xs mt-1">
-                        Please enter a valid email address.
+                        Please enter a valid student email address.
                       </p>
                     )}
                   </div>
@@ -279,7 +281,7 @@ const SignUp = () => {
                         type="text"
                         id="name"
                         name="name"
-                        placeholder="e.g. Campus Tech Club"
+                        placeholder="Enter Organisation Name"
                         value={organisationName}
                         onChange={(e) => setOrganisationName(e.target.value)}
                         className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3.5 pl-12 pr-4 text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
@@ -320,7 +322,7 @@ const SignUp = () => {
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
                       <input
                         id="password"
-                    name="password"
+                       name="password"
                         type={showPass ? "text" : "password"}
                         placeholder="••••••••"
                         value={organiserPassword}
@@ -348,7 +350,7 @@ const SignUp = () => {
             <button
           type="submit"
            disabled={loading || !isFormValid()}
-          className={`w-[90%] mx-auto bg-[#FF3A66] ${isFormValid() ? 'hover:bg-[#cf153e]' : ''} text-[#FFFFFF] font-semibold py-4 rounded-full mt-6 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`w-full mx-auto bg-rose-600 ${isFormValid() ? 'hover:bg-rose-700' : ''} text-[#FFFFFF] font-semibold py-4 rounded-full mt-6 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed`}
            >
             {loading ? (<><Loader2 className="animate-spin mr-2" />Creating account...</>) : 'Create Account'}
            {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
