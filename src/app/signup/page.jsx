@@ -63,31 +63,40 @@ const SignUp = () => {
 
     try {
       let payload;
+      let endpoint;
       if (role === "Student") {
         payload = {
-          firstName,
-          lastName,
-          role,
-          email,
-          password,
+          Firstname: firstName,
+          Lastname: lastName,
+          Email: email,
+          Password: password,
         };
+        endpoint = "/student/register/";
       } else {
         payload = {
-          organisationName,
-          email: organiserEmail,
-          password: organiserPassword,
-          role,
+          Organization_Name: organisationName,
+          Email: organiserEmail,
+          Password: organiserPassword,
+          Phone: "", // Add phone field if needed in form
         };
+        endpoint = "/organizer/register/";
       }
 
-      const res = await api.post("/student/signup/", payload);
-      loginUser(res.data.user, res.data.token);
-      toast.success('Account Created Successfully. Please verify your email.')
-      // Redirect to OTP verification page for both students and organizers
-      const userEmail = role === "Student" ? email : organiserEmail;
-      router.push(`/verify-otp?email=${userEmail}`);
+      const res = await api.post(endpoint, payload);
+      
+      if (role === "Student") {
+         toast.success(res.data.message || 'OTP sent to email.')
+         router.push(`/verify-otp?email=${email}`);
+      } else {
+         // Organizer registration is immediate
+         const { email, access, refresh } = res.data;
+         loginUser({ email }, access);
+         toast.success('Account Created Successfully')
+         router.push("/dashboard");
+      }
+
     } catch (err) {
-      toast.error(err.response?.data?.message || "Signup failed.");
+      toast.error(err.response?.data?.error || "Signup failed.");
     } finally {
       setLoading(false);
     }
@@ -97,16 +106,19 @@ const SignUp = () => {
     onSuccess: async (tokenResponse) => {
       setLoading(true);
       try {
-        const res = await api.post('/auth/google', {
+        const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
+        const res = await api.post(endpoint, {
           token: tokenResponse.access_token,
-          role: role
         });
-        loginUser(res.data.user, res.data.token);
+        
+        const { email, access, refresh } = res.data;
+        loginUser({ email }, access);
+        
         toast.success('Account Created Successfully');
         router.push("/dashboard");
       } catch (err) {
         console.error('Google signup error:', err);
-        toast.error(err.response?.data?.message || "Google signup failed");
+        toast.error(err.response?.data?.error || "Google signup failed");
       } finally {
         setLoading(false);
       }

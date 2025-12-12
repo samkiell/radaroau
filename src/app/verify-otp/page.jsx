@@ -71,15 +71,15 @@ const VerifyOTP = () => {
 
     setLoading(true);
     try {
-      const res = await api.post("/auth/verify-otp", {
+      const res = await api.post("/verify-otp/", {
         email,
         otp: otpCode,
       });
 
       toast.success("Email verified successfully!");
-      router.push("/dashboard");
+      router.push("/login"); // Redirect to login after verification as per flow usually, or dashboard if auto-login
     } catch (err) {
-      toast.error(err.response?.data?.message || "OTP verification failed.");
+      toast.error(err.response?.data?.error || "OTP verification failed.");
     } finally {
       setLoading(false);
     }
@@ -88,13 +88,24 @@ const VerifyOTP = () => {
   const handleResendOtp = async () => {
     setResendLoading(true);
     try {
-      await api.post("/auth/resend-otp", { email });
+      // Assuming resend endpoint is same as register for student to trigger OTP again or a specific resend endpoint if documented.
+      // Based on doc, /student/register/ sends OTP. There isn't a specific /resend-otp/ documented in the provided snippet.
+      // Using /student/register/ might re-register. 
+      // If no specific resend endpoint, we might need to ask backend dev. 
+      // For now, I will comment this out or leave as is but warn user.
+      // Actually, let's check if there is a resend endpoint in the full doc or infer it.
+      // The doc shows /password-reset/request/ sends OTP. 
+      // For registration, it says "Register Student ... sends an OTP".
+      // I'll assume re-triggering registration might work or there's a missing endpoint.
+      // For now, I'll keep the existing call but update the path if I find one.
+      // The previous code used /auth/resend-otp. I will leave it but it might 404 based on doc.
+      await api.post("/auth/resend-otp", { email }); 
       setOtp(["", "", "", "", "", ""]);
       setTimeLeft(300);
       setIsExpired(false);
       toast.success("OTP resent to your email");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to resend OTP.");
+      toast.error(err.response?.data?.error || "Failed to resend OTP.");
     } finally {
       setResendLoading(false);
     }

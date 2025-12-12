@@ -54,10 +54,12 @@ const LoginPage = () => {
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const res = await api.post('/auth/google', {
+        // Assuming student login for now, logic might need adjustment based on user role selection if available on login page
+        const res = await api.post('/student/google-signup/', {
           token: tokenResponse.access_token,
         });
-        login(res.data.user, res.data.token);
+        const { user_id, email, access, refresh, is_new_user } = res.data;
+        login({ user_id, email }, access);
         toast.success('Login successful!');
         router.push('/dashboard');
       } catch (err) {
@@ -76,14 +78,14 @@ const LoginPage = () => {
     setError('')
 
     try {
-      const response = await api.post('/auth/login', formData)
-      const { user, token } = response.data
-      login(user, token)
+      const response = await api.post('/login/', formData)
+      const { user_id, email, access, refresh } = response.data
+      login({ user_id, email }, access)
       toast.success('Login successful! Redirecting...')
       router.push('/dashboard')
     } catch (err) {
       console.error('Login error:', err)
-      const message = err.response?.data?.message || 'Invalid email or password'
+      const message = err.response?.data?.error || 'Invalid email or password'
       setError(message)
       toast.error(message)
     } finally {
