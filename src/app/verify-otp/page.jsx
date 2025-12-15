@@ -16,7 +16,7 @@ const VerifyOTP = () => {
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
   const [isExpired, setIsExpired] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
 
@@ -96,7 +96,7 @@ const VerifyOTP = () => {
       // Try the common resend endpoint — adjust if your backend uses a different path
       await api.post("/resend-otp/", { email });
       setOtp(["", "", "", "", "", ""]);
-      setTimeLeft(300);
+      setTimeLeft(600);
       setIsExpired(false);
       toast.success("OTP resent to your email");
     } catch (err) {
@@ -144,7 +144,7 @@ const VerifyOTP = () => {
             Verify Your Email
           </h1>
           <p className="text-base text-gray-400 mb-8 text-center">
-            We've sent a 6-digit code to <span className="text-white font-semibold">{email}</span> {role ? `for your ${role} account` : 'to your email address'}.
+            OTP sent to email. Please verify to complete registration.
           </p>
 
           <form onSubmit={handleVerifyOtp} className="space-y-6">

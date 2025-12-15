@@ -8,6 +8,7 @@ import toast from 'react-hot-toast'
 import api from "../../lib/axios";
 import useAuthStore from "../../store/authStore";
 import { Mail, Lock, User, Eye, EyeOff, UsersIcon, Loader2, ArrowRight } from "lucide-react";
+import login from "../components/login/page";
 
 const SignUp = () => {
   const router = useRouter();
@@ -95,14 +96,17 @@ const SignUp = () => {
         };
       }
 
-      // Always require email verification for both Students and Organizers.
-      // Redirect to the OTP verification page and include the role so the
-      // verification page can display role-specific messaging if desired.
+       login(user, token)
       toast.success('Account created. Please verify your email using the OTP sent.');
       const userEmail = role === "Student" ? email : organiserEmail;
       router.push(`/verify-otp?email=${encodeURIComponent(userEmail)}&role=${encodeURIComponent(role)}`);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Signup failed.");
+      // Log the full error for debugging (network/CORS/backend issues)
+      // and show a more informative toast to the user.
+      console.error("Signup error:", err);
+      const message =
+        err.response?.data?.message || err.response?.data?.detail || err.message || "Signup failed.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -119,7 +123,10 @@ const SignUp = () => {
       toast.success('Account Created Successfully')
       router.push("/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Signup failed.");
+      console.error("Social signup error:", err);
+      const message =
+        err.response?.data?.message || err.response?.data?.detail || err.message || "Signup failed.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -154,7 +161,7 @@ const SignUp = () => {
             Logo
           </div>
 
-          <h1 className="text-4xl font-bold text-white mb-8 text-center">
+          <h1 className="text-4xl font-semibold text-white mb-8 text-center">
             Create Account
           </h1>
 
