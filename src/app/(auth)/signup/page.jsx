@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import api from "../../lib/axios";
-import useAuthStore from "../../store/authStore";
+import api from "../../../lib/axios";
+import useAuthStore from "../../../store/authStore";
 import { Mail, Lock, User, Eye, EyeOff, UsersIcon, Loader2, ArrowRight } from "lucide-react";
-import login from "../components/login/page";
+import login from "../../components/login/page";
 
 const SignUp = () => {
   const router = useRouter();
