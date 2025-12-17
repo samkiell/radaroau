@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { useGoogleLogin } from '@react-oauth/google'
 import api from "../../../lib/axios";
 import useAuthStore from "../../../store/authStore";
 import { Mail, Lock, User, Eye, EyeOff, UsersIcon, Loader2, ArrowRight } from "lucide-react";
+import login from "../../components/login/page";
 
 const SignUp = () => {
   const router = useRouter();
@@ -99,6 +99,7 @@ const SignUp = () => {
 
     } catch (err) {
       toast.error(err.response?.data?.error || "Signup failed.");
+
     } finally {
       setLoading(false);
     }
@@ -164,6 +165,7 @@ const SignUp = () => {
           </div>
 
           <h1 className="text-4xl font-bold text-white mb-8 text-center">
+
             Create Account
           </h1>
 

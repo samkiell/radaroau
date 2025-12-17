@@ -1,18 +1,29 @@
 'use client'
-import useAuthStore from "@/store/authStore"
-import { useRouter } from "next/navigation"
+import { useEffect } from "react";
+import useAuthStore from "../../store/authStore";
+import { useRouter } from "next/navigation";
+import { Loader2 } from 'lucide-react'
+
 
 const authLayout = ({children}) => {
-    const router = useRouter()
     const user = useAuthStore(state => state.user)
-
-    if(user) {
-     router.push('/dashboard')
-     return null
+    const router = useRouter()
+    useEffect(() => {
+         if(user) {
+         router.push('/dashboard')
     }
 
-    return (
-        {children}
-    )
+    },[user, router])
+
+     if (user) return (
+        <>
+         <div className="animate-spin">
+            <Loader2 />
+         </div>
+        </>
+     )
+    return children
+
 }
-export default authLayout
+
+export default authLayout;
