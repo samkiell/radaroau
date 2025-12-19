@@ -257,16 +257,21 @@ const LoginPage = () => {
             </div>
 
             {/* Social Login Option */}
-            <Button
-              variant="outline"
-              onClick={() => handleGoogleLogin()}
-              className="w-full h-12 rounded-xl border-gray-800 bg-zinc-900 hover:bg-zinc-800 text-gray-300 transition-all duration-200"
-            >
-              <div className="flex items-center justify-center gap-3">
-                <div className="h-5 w-5 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500">G</div>
-                <span>Continue with Google</span>
-              </div>
-            </Button>
+                   <Button
+                      variant="outline"
+                      onClick={() => handleGoogleLogin()}
+                      className="w-full h-12 rounded-xl border-gray-800 bg-zinc-900 hover:bg-zinc-800 text-gray-300 transition-all duration-200"
+                    >
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="h-5 w-5 flex items-center justify-center">
+                          <img
+                           src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                            alt="Google" 
+                          />
+                        </div>
+                        <span>Continue with Google</span>
+                      </div>
+                    </Button>
           </div>
         </div>
       </motion.div>
