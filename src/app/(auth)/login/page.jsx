@@ -52,7 +52,6 @@ const LoginPage = () => {
 
   // const handleGoogleLogin = useGoogleLogin({
   //   onSuccess: async (tokenResponse) => {
-  //     const toastId = toast.loading('Verifying Google account...')
   //     try {
   //       // Assuming student login for now, logic might need adjustment based on user role selection if available on login page
   //       const res = await api.post('/student/google-signup/', {
@@ -60,12 +59,11 @@ const LoginPage = () => {
   //       });
   //       const { user_id, email, access, refresh, is_new_user } = res.data;
   //       login({ user_id, email }, access);
-  //       toast.success('Login successful!', { id: toastId });
+  //       toast.success('Login successful!');
   //       router.push('/dashboard');
   //     } catch (err) {
   //       console.error('Google login error:', err);
-  //       const message = getErrorMessage(err);
-  //       toast.error(message, { id: toastId });
+  //       toast.error('Google login failed');
   //     }
   //   },
   //   onError: () => {
