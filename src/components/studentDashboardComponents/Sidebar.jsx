@@ -1,54 +1,55 @@
 "use client";
 
 import {
-  Group,
-  GroupIcon,
+  Calendar,
   Home,
   LogOut,
-  PlusIcon,
-  QrCodeIcon,
   Settings,
+  Ticket,
   User,
-  User2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import useAuthStore from "@/store/authStore";
+import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 
-const OrganizationDashboardNavLinks = [
-  { name: "Overview", link: "/dashboard/org", icon: <Home size={30} /> },
+const StudentDashboardNavLinks = [
+  { name: "Overview", link: "/dashboard/student", icon: <Home size={30} /> },
   {
-    name: "Create Event",
-    link: "/dashboard/org/create-event",
-    icon: <PlusIcon size={30} />,
+    name: "Events",
+    link: "/dashboard/student/events",
+    icon: <Calendar size={30} />,
   },
   {
-    name: "My Event",
-    link: "/dashboard/org/my-event",
-    icon: <GroupIcon size={30} />,
+    name: "My Tickets",
+    link: "/dashboard/student/my-tickets",
+    icon: <Ticket size={30} />,
   },
-  {
-    name: "QR Scanner",
-    link: "/dashboard/org/qr-scanner",
-    icon: <QrCodeIcon size={30} />,
-  },
-  { name: "Profile", link: "/dashboard/org/profile", icon: <User size={30} /> },
+  { name: "Profile", link: "/dashboard/student/profile", icon: <User size={30} /> },
 ];
 
 const Sidebar = () => {
   const location = usePathname();
-  console.log(location);
-  const active = OrganizationDashboardNavLinks.find(
+  const logout = useAuthStore((state) => state.logout);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  const active = StudentDashboardNavLinks.find(
     (link) => location === `${link.link}`
   );
-  console.log(active);
+
   return (
     <>
       <div className="hidden md:flex justify-center mb-6">
         <Logo />
       </div>
       <div className="flex flex-row justify-around max-sm:items-center md:flex-col md:gap-8">
-        {OrganizationDashboardNavLinks.map((link) => (
+        {StudentDashboardNavLinks.map((link) => (
           <Link
             href={link.link}
             key={link.name}
@@ -70,15 +71,18 @@ const Sidebar = () => {
 
       <div className="mt-8 space-y-7 hidden md:block">
         <Link
-          href={`/dashboard/org/settings`}
-          className={`${location === "/dashboard/org/settings" ? "bg-gray-200 flex gap-3 text-gray-800 p-2 rounded-xl font-bold" : "md:flex md:flex-row hidden md:gap-3 items-center"}`}
+          href={`/dashboard/student/settings`}
+          className={`${location === "/dashboard/student/settings" ? "bg-gray-200 flex gap-3 text-gray-800 p-2 rounded-xl font-bold" : "md:flex md:flex-row hidden md:gap-3 items-center"}`}
         >
           <span>
             <Settings />
           </span>
           <p>Settings</p>
         </Link>
-        <button className="hover:bg-gray-200 p-2 md:p-2 hover:rounded-xl font-bold md:flex md:flex-row hidden md:gap-3 items-center text-red-500 cursor-pointer">
+        <button 
+          onClick={handleLogout}
+          className="hover:bg-gray-200 p-2 md:p-2 hover:rounded-xl font-bold md:flex md:flex-row hidden md:gap-3 items-center text-red-500 cursor-pointer w-full"
+        >
           <span>
             <LogOut />
           </span>

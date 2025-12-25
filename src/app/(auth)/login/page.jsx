@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import api from '../../../lib/axios'
 import useAuthStore from '../../../store/authStore'
 import { Button } from '../../../components/ui/button'
+import Logo from '@/components/Logo'
 
 const LoginPage = () => {
   const router = useRouter()
@@ -45,6 +46,14 @@ const LoginPage = () => {
     return re.test(email)
   }
 
+  const parseJwt = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      return null;
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
     setError('')
@@ -79,8 +88,16 @@ const LoginPage = () => {
 
     try {
       const response = await api.post('/login/', formData)
-      const { user_id, email, access, refresh } = response.data
-      login({ user_id, email }, access)
+      const { user_id, email, access, refresh, role: responseRole } = response.data
+      
+      let userRole = responseRole;
+      if (!userRole && access) {
+        const decoded = parseJwt(access);
+        // Check for common role claims
+        userRole = decoded?.role || decoded?.user_type || (decoded?.is_organizer ? 'organizer' : 'student');
+      }
+
+      login({ user_id, email }, access, userRole)
       toast.success('Login successful! Redirecting...', { id: toastId })
       router.push('/dashboard')
     } catch (err) {
@@ -120,8 +137,8 @@ const LoginPage = () => {
         className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 lg:px-16 xl:px-24 overflow-y-auto"
       >
         <div className="w-full max-w-md">
-          <div className="text-[#FF3A66] text-3xl font-bold mb-8 text-center">
-            Logo
+          <div className="flex justify-center mb-8">
+            <Logo textSize="text-3xl" iconSize="h-8 w-8" />
           </div>
 
           <h1 className="text-4xl font-bold text-white mb-2 text-center">
