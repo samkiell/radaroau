@@ -41,21 +41,27 @@ const Header = () => {
         <nav className="hidden md:flex items-center gap-6">
           {user ? (
             <>
-              <Link href="/dashboard" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                Dashboard
-              </Link>
+
+              {!pathname.startsWith('/dashboard') && (
+                <Link href="/dashboard" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">
+                  Dashboard
+                </Link>
+              )}
               <div className="flex items-center gap-4">
                  <span className="text-sm text-gray-400">Hi, {user.email?.split('@')[0]}</span>
-                 <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={logout}
-                    className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                 >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                 </Button>
+                 {!pathname.startsWith('/dashboard') && (
+                   <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={logout}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                   >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                   </Button>
+                 )}
               </div>
+
             </>
           ) : (
             <>
