@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+
+import { GoogleAuthProvider } from "@/components/GoogleAuthProvider";
+
 export const metadata = {
   title: "Radar",
   description: "Ticket app",
@@ -29,7 +32,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-
+      <body
         className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased bg-[#0A0A14] text-white flex flex-col min-h-screen`}
       >
         <GoogleAuthProvider>
@@ -41,8 +44,8 @@ export default function RootLayout({ children }) {
           <Footer />
         </GoogleAuthProvider>
       </body>
-
     </html>
   );
 }
+
 

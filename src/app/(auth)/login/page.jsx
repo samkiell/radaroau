@@ -13,7 +13,7 @@ import Logo from '@/components/Logo'
 import { getErrorMessage } from '@/lib/utils'
 
 
-import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
 
