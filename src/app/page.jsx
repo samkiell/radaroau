@@ -122,7 +122,7 @@ const LandingPage = () => {
               <h2 className="text-3xl md:text-4xl font-bold mb-2">Discover Events</h2>
               <p className="text-gray-400">Explore trending events happening around you</p>
             </div>
-            <Link href="/signup">
+            <Link href="/events">
               <Button variant="outline" className="hidden md:flex border-white/20 hover:bg-white/10 text-white">
                 View All Events
               </Button>
@@ -138,7 +138,7 @@ const LandingPage = () => {
           ) : events.length > 0 ? (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {events.map((event) => (
-                <Link href={`/login`} key={event.event_id}>
+                <Link href={`/dashboard/student/events/${event.event_id}`} key={event.event_id}>
                   <motion.div 
                     whileHover={{ y: -5 }}
                     className="group h-full rounded-2xl bg-white/5 border border-white/10 overflow-hidden hover:border-primary/50 transition-colors"
@@ -192,7 +192,7 @@ const LandingPage = () => {
           )}
           
           <div className="mt-8 text-center md:hidden">
-            <Link href="/signup">
+            <Link href="/events">
               <Button size="lg" className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white">
                 View All Events
               </Button>
