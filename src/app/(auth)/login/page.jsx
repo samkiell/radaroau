@@ -139,7 +139,9 @@ const LoginPage = () => {
       >
         <div className="w-full max-w-md">
           <div className="flex justify-center mb-6 md:mb-8">
-            <Logo textSize="text-2xl md:text-3xl" iconSize="h-6 w-6 md:h-8 md:w-8" />
+            <Logo
+            href= "/" textColor="white"
+            textSize="text-2xl md:text-3xl" iconSize="h-6 w-6 md:h-8 md:w-8" />
           </div>
 
           <h1 className="text-2xl md:text-4xl font-bold text-white mb-2 text-center">
