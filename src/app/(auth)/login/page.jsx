@@ -27,23 +27,13 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [greeting, setGreeting] = useState('')
+
   const [isValidEmail, setIsValidEmail] = useState(false)
 
-  const extractUsername = (email) => {
-    if (!email || !email.includes('@')) return ''
-    return email.split('@')[0]
-  }
+
 
   useEffect(() => {
-    const username = extractUsername(formData.email)
-    if (username) {
-      setGreeting(`Hello, ${username}! 👋`)
-      setIsValidEmail(validateEmail(formData.email))
-    } else {
-      setGreeting('')
-      setIsValidEmail(false)
-    }
+    setIsValidEmail(validateEmail(formData.email))
   }, [formData.email])
 
   const validateEmail = (email) => {
@@ -152,26 +142,9 @@ const LoginPage = () => {
             Welcome Back
           </h1>
           
-          <AnimatePresence mode="wait">
-            {greeting ? (
-              <motion.div
-                key="greeting"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mb-6 md:mb-8 text-center"
-              >
-                <p className="text-sm md:text-base font-medium text-rose-400 flex items-center justify-center gap-2">
-                  <Sparkles className="h-3 w-3 md:h-4 md:w-4" />
-                  {greeting}
-                </p>
-              </motion.div>
-            ) : (
-              <p className="text-sm md:text-base text-gray-400 mb-6 md:mb-8 text-center">
-                Sign in to get your tickets
-              </p>
-            )}
-          </AnimatePresence>
+          <p className="text-sm md:text-base text-gray-400 mb-6 md:mb-8 text-center">
+            Sign in to get your tickets
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {/* Email Field */}
