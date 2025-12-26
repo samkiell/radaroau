@@ -108,7 +108,7 @@ const Header = () => {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="md:hidden fixed top-0 right-0 h-full w-[80%] max-w-sm bg-[#0A0A14] border-l border-gray-800 z-50 overflow-y-auto shadow-2xl"
+              className="md:hidden fixed top-0 right-0 h-full w-[80%] bg-[#0A0A14] z-[100] overflow-x-auto"
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between p-4 border-b border-gray-800">
