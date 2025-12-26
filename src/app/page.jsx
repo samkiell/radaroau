@@ -143,19 +143,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-12 bg-[#05050A]">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-          <Logo iconSize="h-4 w-4" textSize="text-lg" className="scale-90" />
-          <div className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Radar. All rights reserved.
-          </div>
-          <div className="flex gap-6 text-sm text-gray-400">
-            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
-          </div>
-        </div>
-      </footer>
+
     </div>
   );
 };
