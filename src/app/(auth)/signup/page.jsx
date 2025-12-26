@@ -91,18 +91,18 @@ const SignUp = () => {
       const res = await api.post(endpoint, payload);
       
       if (role === "Student") {
-         toast.success(res.data.message || 'OTP sent to email.')
+         toast.success(res.data.message || 'OTP sent to email.', { id: toastId })
          router.push(`/verify-otp?email=${email}`);
       } else {
          // Organizer registration is immediate
          const { email, access, refresh } = res.data;
          loginUser({ email }, access);
-         toast.success('Account Created Successfully')
+         toast.success('Account Created Successfully', { id: toastId })
          router.push("/dashboard");
       }
 
     } catch (err) {
-      toast.error(err.response?.data?.error || "Signup failed.");
+      toast.error(err.response?.data?.error || "Signup failed.", { id: toastId });
 
     } finally {
       setLoading(false);
