@@ -30,11 +30,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased bg-[#0A0A14] text-white`}
+        className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased bg-[#0A0A14] text-white flex flex-col min-h-screen`}
       >
           <Toaster position="top-center" />
           <Header />
-          <main className="min-h-screen">
+          <main className="flex-grow">
             {children}
           </main>
           <Footer />
