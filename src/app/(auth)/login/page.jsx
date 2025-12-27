@@ -62,7 +62,7 @@ const LoginPage = () => {
           token: tokenResponse.access_token,
         });
         const { user_id, email, access, refresh, is_new_user } = res.data;
-        login({ user_id, email }, access);
+        login({ user_id, email }, access, "student");
         toast.success('Login successful!');
         router.push('/dashboard');
       } catch (err) {
