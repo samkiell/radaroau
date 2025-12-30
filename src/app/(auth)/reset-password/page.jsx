@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Button } from "../../../components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -11,12 +11,10 @@ import { Mail, Lock, Loader2, ArrowRight, ArrowLeft, Eye, EyeOff } from "lucide-
 import BackgroundCarousel from "../../../components/BackgroundCarousel";
 import Logo from "@/components/Logo";
 
-const ResetPassword = () => {
+const ResetPasswordContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  // const email = searchParams.get('email');
-    const [email, setEmail] = useState(null); 
-
+  const [email, setEmail] = useState(null); 
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,8 +23,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1); // 1: verify OTP, 2: set new password
 
-
-  useEffect(() => { // 🔹 CHANGED: handle email + redirect in one place
+  useEffect(() => {
     const e = searchParams.get('email');
     if (!e && !loading) {
       router.replace('/forgot-password');
@@ -35,10 +32,8 @@ const ResetPassword = () => {
     }
   }, [searchParams, loading, router]);
 
-
   const shortPassword = newPassword.length > 0 && newPassword.length < 8;
   const passwordMismatch = confirmPassword.length > 0 && confirmPassword !== newPassword;
-
   const isOtpValid = otp.length === 6 && /^\d+$/.test(otp);
   const isPasswordFormValid = newPassword.length >= 8 && confirmPassword === newPassword;
 
@@ -46,13 +41,11 @@ const ResetPassword = () => {
     e.preventDefault();
     setLoading(true);
     const toastId = toast.loading('Verifying OTP...');
-
     try {
       const res = await api.post('/password-reset/verify/', {
         email: email,
         otp: otp,
       });
-
       toast.success(res.data.message || 'OTP verified successfully.', { id: toastId });
       setStep(2);
     } catch (err) {
@@ -66,17 +59,13 @@ const ResetPassword = () => {
     e.preventDefault();
     setLoading(true);
     const toastId = toast.loading('Resetting password...');
-
     try {
-      // console.log('Resetting password with:', { email, otp: parseInt(otp), new_password: newPassword, confirm_password: confirmPassword });
       const res = await api.post('/password-reset/confirm/', {
         email: email,
         otp: otp,
         new_password: newPassword,
         confirm_password: confirmPassword,
       });
-      console.log('Password reset response:', res);
-
       toast.success(res.data.message || 'Password reset successful.', { id: toastId });
       router.push('/login');
     } catch (err) {
@@ -87,7 +76,7 @@ const ResetPassword = () => {
   };
 
   if (!email) {
-    return null; // Redirecting...
+    return null;
   }
 
   return (
@@ -231,7 +220,6 @@ const ResetPassword = () => {
             </form>
           )}
 
-          {/* Back button */}
           <div className="text-center mt-6">
             <button
               onClick={() => step === 1 ? router.push('/forgot-password') : setStep(1)}
@@ -247,4 +235,14 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#0A0A14] text-white">
+        <Loader2 className="animate-spin h-8 w-8 text-rose-500" />
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
+  );
+}
