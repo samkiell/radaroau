@@ -83,8 +83,8 @@ const VerifyOTPContent = () => {
         otp: otpCode,
       });
 
-     const { user_id, email: verifiedEmail, access, role } = res.data;
-login({ user_id, email: verifiedEmail }, access, role);
+      const { user_id, email: verifiedEmail, access, refresh, role } = res.data;
+      login({ user_id, email: verifiedEmail }, access, refresh, role);
 
 toast.success("Email verified successfully! Redirecting...", { id: toastId });
 router.push("/dashboard");

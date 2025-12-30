@@ -1,4 +1,4 @@
-import Sidebar from "@/components/organizersDashboardComponents/sidebar"
+import Sidebar from "@/components/organizersDashboardComponents/Sidebar"
 import React from 'react'
 
 const organizersDashboardLayout = ({children}) => {

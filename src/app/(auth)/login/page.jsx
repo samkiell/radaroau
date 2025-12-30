@@ -91,7 +91,7 @@ const LoginPage = () => {
         userRole = decoded?.role || decoded?.user_type || (decoded?.is_organizer ? 'organizer' : 'student');
       }
 
-      login({ user_id, email }, access, userRole)
+      login({ user_id, email }, access, refresh, userRole)
       toast.success('Login successful! Redirecting...', { id: toastId })
       router.push('/dashboard')
     } catch (err) {

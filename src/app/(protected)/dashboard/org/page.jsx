@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import api from "../../../../lib/axios";
 import { Banknote, Ticket, Users, Calendar, TrendingUp, DollarSign, Clock, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-
+import toast from "react-hot-toast";
 
 export default function Overview() {
   const [analytics, setAnalytics] = useState(null);
   const [recentEvents, setRecentEvents] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     async function fetchOverview() {
+      setLoading(true);
       try {
         // Fetch analytics data
         const analyticsRes = await api.get("/organizer/analytics/");
