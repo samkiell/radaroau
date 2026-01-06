@@ -35,14 +35,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${plusJakartaSans.variable} ${geistMono.variable} antialiased bg-background text-foreground flex flex-col min-h-screen`}
       >
-        <GoogleAuthProvider>
+         <GoogleAuthProvider> 
           <Toaster position="top-center" />
           <Header />
           <main className="flex-grow">
             {children}
           </main>
           <Footer />
-        </GoogleAuthProvider>
+         </GoogleAuthProvider> 
       </body>
     </html>
   );
