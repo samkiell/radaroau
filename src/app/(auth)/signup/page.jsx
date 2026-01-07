@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import api from "../../../lib/axios";
 import useAuthStore from "../../../store/authStore";
-// import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { Mail, Lock, User, Eye, EyeOff, UsersIcon, Loader2, ArrowRight, Phone } from "lucide-react";
 import Logo from "@/components/Logo";
 import BackgroundCarousel from "../../../components/BackgroundCarousel";

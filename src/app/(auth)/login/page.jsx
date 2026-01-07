@@ -8,19 +8,13 @@ import { Mail, Lock, Loader2, User, Sparkles, Eye, EyeOff, Check, ArrowRight } f
 import toast from 'react-hot-toast'
 import api from '../../../lib/axios'
 import useAuthStore from '../../../store/authStore'
-// import { useGoogleLogin } from '@react-oauth/google'
-import { Button } from '../../../components/ui/button'
-import Logo from '@/components/Logo'
-import { getErrorMessage } from '@/lib/utils'
-import BackgroundCarousel from '../../../components/BackgroundCarousel'
-
-
 import { useGoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
 
+  const [role, setRole] = useState("Student");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -57,12 +51,12 @@ const LoginPage = () => {
     onSuccess: async (tokenResponse) => {
       const toastId = toast.loading("Logging in with Google...");
       try {
-        // Assuming student login for now, logic might need adjustment based on user role selection if available on login page
-        const res = await api.post("/student/google-signup/", {
+        const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
+        const res = await api.post(endpoint, {
           token: tokenResponse.access_token,
         });
-        const { user_id, email, access, refresh, role } = res.data;
-        login({ user_id, email }, access, refresh, role || "Student");
+        const { user_id, email, access, refresh, role: responseRole } = res.data;
+        login({ user_id, email }, access, refresh, responseRole || role);
         toast.success("Login successful!", { id: toastId });
         router.push("/dashboard");
       } catch (err) {
@@ -139,6 +133,31 @@ const LoginPage = () => {
           <p className="text-sm md:text-base text-gray-400 mb-6 md:mb-8 text-center">
             Sign in to get your tickets
           </p>
+
+           {/* Role Switch */}
+          <div className="flex gap-2 mb-6 md:mb-8">
+            <button
+              onClick={() => setRole("Student")}
+           className={`flex-1 py-2 md:py-3 px-4 md:px-6 rounded-full font-semibold text-sm md:text-base transition-all duration-200 ${
+                role === "Student"
+                  ? "bg-yellow-400 text-black border-yellow-400"
+                  : "border-gray-600 border text-gray-300 hover:border-gray-500"
+              }`}
+              >
+              Student  
+            </button>
+
+            <button
+              onClick={() => setRole("Organizer")}
+              className={`flex-1 py-2 md:py-3 px-4 md:px-6 rounded-full font-semibold text-sm md:text-base transition-all duration-200 ${
+                role === "Organizer"
+                  ? "bg-yellow-400 text-black border-yellow-400"
+                  : "border-gray-600 border text-gray-300 hover:border-gray-500"
+              }`}
+            >
+              Organizer
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {/* Email Field */}
