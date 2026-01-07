@@ -12,25 +12,20 @@ export default function UsersPage() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    // Note: The API currently supports getting organizers. 
-    // Student list endpoint is not yet exposed in this version of the API docs.
-    // Displaying Organizers as Users for now.
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
     try {
-      // Try to get real users (students)
       const usersData = await adminService.getAllUsers();
       
-      // Handle various response structures
+      // API returns { users: [...], pagination: ..., message: ... }
       let combinedUsers = [];
-      if (Array.isArray(usersData)) {
-        combinedUsers = usersData;
-      } else if (usersData?.users) {
+      if (usersData?.users) {
         combinedUsers = usersData.users;
-      } else if (usersData?.students) {
-        combinedUsers = usersData.students;
+      } else if (Array.isArray(usersData)) {
+         // Fallback in case backend returns array directly
+        combinedUsers = usersData;
       }
 
       setUsers(combinedUsers);
@@ -55,7 +50,7 @@ export default function UsersPage() {
        <div>
         <h2 className="text-2xl font-bold tracking-tight">Users</h2>
         <p className="text-sm text-muted-foreground">
-          View and manage registered users. (Currently showing Organizers)
+          View and manage registered users.
         </p>
       </div>
 
@@ -83,28 +78,28 @@ export default function UsersPage() {
                   </tr>
                 ) : (
                   users.map((user) => (
-                    <tr key={user.organiser_id} className="hover:bg-muted/30 transition-colors text-xs">
+                    <tr key={user.id} className="hover:bg-muted/30 transition-colors text-xs">
                       <td className="p-3 flex items-center gap-2.5">
                          <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
                             <User className="h-4 w-4 text-gray-500" />
                          </div>
                          <div>
                             <div className="font-medium">
-                              {user.full_name || user.username || user.organisation_name || "Unknown User"}
+                              {user.name || "Unknown User"}
                             </div>
                             <div className="text-[10px] text-muted-foreground">
-                              {user.id || user.user_id || user.organiser_id}
+                              {user.id}
                             </div>
                          </div>
                       </td>
                       <td className="p-3">{user.email}</td>
                       <td className="p-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border
-                          ${user.organisation_name 
+                          ${user.role === 'organizer'
                             ? "bg-purple-50 text-purple-700 border-purple-100" 
                             : "bg-blue-50 text-blue-700 border-blue-100"
                           }`}>
-                          {user.organisation_name ? "Organizer" : "Student"}
+                          {user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Student"}
                         </span>
                       </td>
                       <td className="p-3 text-muted-foreground">
