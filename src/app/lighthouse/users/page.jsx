@@ -18,6 +18,7 @@ export default function UsersPage() {
 
   const fetchUsers = async (role) => {
     setLoading(true);
+    setUsers([]); // Clear current users to avoid confusing state if fetch fails
     try {
       const params = {};
       if (role !== "all") {

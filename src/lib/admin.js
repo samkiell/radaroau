@@ -57,6 +57,10 @@ export const adminService = {
       const response = await api.get(url);
       return response.data;
     } catch (error) {
+      // If 404, it might mean no users found for this filter
+      if (error.response?.status === 404) {
+        return { users: [] };
+      }
       console.error("Failed to fetch users", error);
       throw error;
     }
