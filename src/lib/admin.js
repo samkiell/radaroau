@@ -50,12 +50,31 @@ export const adminService = {
   // Users
   getAllUsers: async (params = {}) => {
     try {
-      // Build query string from params object (e.g., { page: 1, role: 'student' })
-      const queryString = new URLSearchParams(params).toString();
-      const url = `/api/admin/users/${queryString ? `?${queryString}` : ""}`;
+      let url = "/api/admin/users/";
+
+      // Route to specific endpoints if key params are present
+      // This is often more reliable if the unified endpoint is flaky
+      if (params.role === "student") {
+        url = "/api/admin/students/";
+      } else if (params.role === "organizer") {
+        url = "/api/admin/organisers/";
+      } else {
+        // Build query string for general users endpoint
+        const queryString = new URLSearchParams(params).toString();
+        if (queryString) {
+          url += `?${queryString}`;
+        }
+      }
 
       const response = await api.get(url);
-      return response.data;
+
+      // Normalize response data:
+      // Some endpoints might return { students: [...] }, { organisers: [...] } or { users: [...] }
+      const data = response.data;
+      if (data.students) return { users: data.students };
+      if (data.organisers) return { users: data.organisers };
+
+      return data;
     } catch (error) {
       // If 404, it might mean no users found for this filter
       if (error.response?.status === 404) {

@@ -127,10 +127,6 @@ export default function UsersPage() {
                                 <div className="font-medium truncate max-w-[120px] md:max-w-none">
                                   {user.name || "Unknown User"}
                                 </div>
-                                {/* Show role here on mobile */}
-                                <div className="md:hidden text-[10px] text-muted-foreground mt-0.5">
-                                  {user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Student"}
-                                </div>
                             </div>
                          </div>
                       </td>
