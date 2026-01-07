@@ -48,21 +48,17 @@ export const adminService = {
   },
 
   // Users
-  getAllUsers: async () => {
+  getAllUsers: async (params = {}) => {
     try {
-      const response = await api.get("/api/admin/users/");
+      // Build query string from params object (e.g., { page: 1, role: 'student' })
+      const queryString = new URLSearchParams(params).toString();
+      const url = `/api/admin/users/${queryString ? `?${queryString}` : ""}`;
+
+      const response = await api.get(url);
       return response.data;
     } catch (error) {
-      console.warn(
-        "Failed to fetch /api/admin/users/, trying /api/admin/students/"
-      );
-      try {
-        const response = await api.get("/api/admin/students/");
-        return response.data;
-      } catch (e) {
-        console.error("Failed to fetch users/students", e);
-        return [];
-      }
+      console.error("Failed to fetch users", error);
+      throw error;
     }
   },
 };
