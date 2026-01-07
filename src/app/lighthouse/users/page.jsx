@@ -88,14 +88,14 @@ export default function UsersPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-             <div className="border border-t-0">
+             <div className="border-t-0 overflow-x-auto">
              <table className="w-full text-sm text-left">
               <thead className="bg-muted/40 text-muted-foreground text-xs uppercase tracking-wide">
                 <tr>
-                   <th className="p-3 font-medium">User</th>
-                   <th className="p-3 font-medium">Email</th>
-                   <th className="p-3 font-medium">Role</th>
-                   <th className="p-3 font-medium">Joined</th>
+                   <th className="p-3 font-medium whitespace-nowrap">User</th>
+                   <th className="p-3 font-medium whitespace-nowrap">Email</th>
+                   <th className="p-3 font-medium whitespace-nowrap hidden md:table-cell">Role</th>
+                   <th className="p-3 font-medium whitespace-nowrap hidden lg:table-cell">Joined</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -117,18 +117,28 @@ export default function UsersPage() {
                 ) : (
                   users.map((user) => (
                     <tr key={user.id} className="hover:bg-muted/30 transition-colors text-xs">
-                      <td className="p-3 flex items-center gap-2.5">
-                         <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
-                            <User className="h-4 w-4 text-gray-500" />
-                         </div>
-                         <div>
-                            <div className="font-medium">
-                              {user.name || "Unknown User"}
+                      <td className="p-3">
+                         <div className="flex items-center gap-2.5 min-w-[140px]">
+                            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                                <User className="h-4 w-4 text-gray-500" />
+                            </div>
+                            <div>
+                                <div className="font-medium truncate max-w-[120px] md:max-w-none">
+                                  {user.name || "Unknown User"}
+                                </div>
+                                {/* Show role here on mobile */}
+                                <div className="md:hidden text-[10px] text-muted-foreground mt-0.5">
+                                  {user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Student"}
+                                </div>
                             </div>
                          </div>
                       </td>
-                      <td className="p-3">{user.email}</td>
-                      <td className="p-3">
+                      <td className="p-3 whitespace-nowrap">
+                        <div className="max-w-[150px] md:max-w-none truncate" title={user.email}>
+                          {user.email}
+                        </div>
+                      </td>
+                      <td className="p-3 hidden md:table-cell">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border
                           ${user.role === 'organizer'
                             ? "bg-purple-50 text-purple-700 border-purple-100" 
@@ -137,7 +147,7 @@ export default function UsersPage() {
                           {user.role ? (user.role.charAt(0).toUpperCase() + user.role.slice(1)) : "Student"}
                         </span>
                       </td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 text-muted-foreground hidden lg:table-cell whitespace-nowrap">
                          {new Date(user.created_at).toLocaleDateString()}
                       </td>
                     </tr>
