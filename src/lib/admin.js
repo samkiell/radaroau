@@ -52,18 +52,10 @@ export const adminService = {
     try {
       let url = "/api/admin/users/";
 
-      // Route to specific endpoints if key params are present
-      // This is often more reliable if the unified endpoint is flaky
-      if (params.role === "student") {
-        url = "/api/admin/students/";
-      } else if (params.role === "organizer") {
-        url = "/api/admin/organisers/";
-      } else {
-        // Build query string for general users endpoint
-        const queryString = new URLSearchParams(params).toString();
-        if (queryString) {
-          url += `?${queryString}`;
-        }
+      // Build query string for general users endpoint
+      const queryString = new URLSearchParams(params).toString();
+      if (queryString) {
+        url += `?${queryString}`;
       }
 
       const response = await api.get(url);
