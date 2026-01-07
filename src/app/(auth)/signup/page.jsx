@@ -62,7 +62,6 @@ const SignUp = () => {
   };
 
 
-
   const submitForm = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -113,39 +112,35 @@ const SignUp = () => {
     }
   };
 
-  // const googleLogin = useGoogleLogin({
-  //   onSuccess: async (tokenResponse) => {
-  //     setLoading(true);
-  //     try {
-  //       const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
-  //       const res = await api.post(endpoint, {
-  //         token: tokenResponse.access_token,
-  //       });
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      const toastId = toast.loading('Authenticating with Google...');
+      try {
+        const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
+        const res = await api.post(endpoint, {
+          token: tokenResponse.access_token,
+        });
 
-  //       const { email, access, refresh, is_new_user } = res.data;
-  //       loginUser({ email }, access);
+        const { email, access, refresh, is_new_user } = res.data;
+        // The backend likely returns the user role or we infer it from the context
+        loginUser({ email }, access, refresh, role);
 
-  //       if (is_new_user) {
-  //         toast.success('Account Created Successfully');
-  //       } else {
-  //         toast.success('Login Successful');
-  //       }
-  //       router.push("/dashboard");
-  //     } catch (err) {
-  //       console.error('Google signup error:', err);
-  //       toast.error(err.response?.data?.error || "Google signup failed");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   },
-  //   onError: () => toast.error('Google signup failed'),
-  // });
-
-  // const handleSocialLogin = (provider) => {
-  //   if (provider === 'Google') {
-  //     googleLogin();
-  //   }
-  // }
+        if (is_new_user) {
+          toast.success('Account Created Successfully', { id: toastId });
+        } else {
+          toast.success('Login Successful', { id: toastId });
+        }
+        router.push("/dashboard");
+      } catch (err) {
+        console.error('Google signup error:', err);
+        toast.error(err.response?.data?.error || "Google signup failed", { id: toastId });
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => toast.error('Google signup failed'),
+  });
 
   return (
     <div className="min-h-screen w-full flex bg-[#0A0A14]">
@@ -423,19 +418,10 @@ const SignUp = () => {
 
               {/* --- Social Login Buttons --- */}
         <div className="flex gap-4 justify-center mb-4">
-            {/* <button
-                type="button"
-                onClick={() => handleSocialLogin('Google')}
-                disabled={loading}
-                className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 group"
-                title="Sign up with Google"
-            >
-                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform"/>
-            </button> */}
-
                 <Button
               variant="outline"
-              onClick={() => toast.error('Social login currently unavailable')}
+              type="button"
+              onClick={() => googleLogin()}
               className="w-full h-10 md:h-12 rounded-xl border-gray-800 bg-zinc-900 hover:bg-zinc-800 text-gray-300 transition-all duration-200"
             >
               <div className="flex items-center justify-center gap-3">
