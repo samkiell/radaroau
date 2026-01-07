@@ -9,6 +9,9 @@ import toast from 'react-hot-toast'
 import api from '../../../lib/axios'
 import useAuthStore from '../../../store/authStore'
 import { useGoogleLogin } from '@react-oauth/google';
+import { Button } from '../../../components/ui/button'
+import Logo from '@/components/Logo'
+import BackgroundCarousel from '../../../components/BackgroundCarousel'
 
 const LoginPage = () => {
   const router = useRouter();
