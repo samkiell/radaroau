@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import api from "../../../../../../lib/axios";
-import { Copy, ArrowLeft, Edit2 } from "lucide-react";
+import { Copy, ArrowLeft, ChevronLeft, FileText, BarChart3, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { getImageUrl } from "../../../../../../lib/utils";
 
@@ -159,7 +159,7 @@ export default function EventDetailsPage() {
   return (
     <div className="min-h-screen p-4 md:p-8 space-y-8 max-w-7xl mx-auto text-white">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <button onClick={() => router.back()} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
@@ -234,34 +234,34 @@ export default function EventDetailsPage() {
               </div>
             ))}
           </div>
-      </div>
+        </section>
 
-      {/* Sidebar Stats */}
-      <div className="space-y-6">
-        <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-6 shadow-xl sticky top-6">
-          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-rose-500" /> Ticket Overview
-          </h3>
+        {/* Sidebar Stats */}
+        <div className="space-y-6">
+          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-6 shadow-xl sticky top-6">
+            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-rose-500" /> Ticket Overview
+            </h3>
 
-          <div className="space-y-4">
-            {ticketStats.map((stat) => (
-              <div key={stat.label} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                <span className="text-gray-400 text-xs font-medium">{stat.label}</span>
-                <span className={`font-bold ${stat.label === 'Revenue' ? 'text-emerald-400' : 'text-white'}`}>
-                  {stat.value}
-                </span>
-              </div>
-            ))}
-          </div>
+            <div className="space-y-4">
+              {ticketStats.map((stat) => (
+                <div key={stat.label} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-gray-400 text-xs font-medium">{stat.label}</span>
+                  <span className={`font-bold ${stat.label === 'Revenue' ? 'text-emerald-400' : 'text-white'}`}>
+                    {stat.value}
+                  </span>
+                </div>
+              ))}
+            </div>
 
-          <div className="mt-8 pt-6 border-t border-white/5">
-            <button className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
-              View Detailed Analytics <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            <div className="mt-8 pt-6 border-t border-white/5">
+              <button className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
+                View Detailed Analytics <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    </div >
   );
 }

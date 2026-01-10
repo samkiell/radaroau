@@ -14,7 +14,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
   const { user, role, logout, isAuthenticated } = useAuthStore();
-  
+
   if (pathname.startsWith('/dashboard/org')) return null;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -75,7 +75,6 @@ const Header = () => {
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Logout
-<<<<<<< HEAD
                     </Button>
                   )}
                 </div>
@@ -89,33 +88,12 @@ const Header = () => {
                 </Link>
                 <Link href="/signup">
                   <Button className="bg-rose-600 hover:bg-rose-700 text-white">
-                    Sign Up
+                    Get Started
                   </Button>
                 </Link>
               </>
             )}
           </nav>
-=======
-                   </Button>
-                 )}
-              </div>
-            </>
-          ) : (
-            <>
-              <Link href="/login">
-                <Button variant="ghost" className="text-gray-300 hover:text-white">
-                  Login
-                </Button>
-              </Link>
-              <Link href="/signup">
-                <Button className="bg-rose-600 hover:bg-rose-700 text-white">
-                  Get Started
-                </Button>
-              </Link>
-            </>
-          )}
-        </nav>
->>>>>>> a4cb2d68ecbdc5cae113311945fd549de6efea96
 
           {/* Mobile Hamburger Menu Button */}
           {/* <button
@@ -207,8 +185,8 @@ const Header = () => {
                           href="/"
                           onClick={closeMenu}
                           className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full ${pathname === "/"
-                              ? "bg-rose-600/10 text-rose-500"
-                              : "hover:bg-gray-800 text-gray-300 hover:text-white"
+                            ? "bg-rose-600/10 text-rose-500"
+                            : "hover:bg-gray-800 text-gray-300 hover:text-white"
                             }`}
                         >
                           <Home className="h-5 w-5" />
@@ -220,8 +198,8 @@ const Header = () => {
                             href={link.href}
                             onClick={closeMenu}
                             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full ${pathname === link.href
-                                ? "bg-rose-600/10 text-rose-500"
-                                : "hover:bg-gray-800 text-gray-300 hover:text-white"
+                              ? "bg-rose-600/10 text-rose-500"
+                              : "hover:bg-gray-800 text-gray-300 hover:text-white"
                               }`}
                           >
                             {link.icon}

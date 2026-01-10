@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../../../../lib/axios";
-import { Loader2, Copy, Check, ExternalLink } from "lucide-react";
+import { Loader2, Copy, Check, ExternalLink, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 import { getImageUrl } from "../../../../../lib/utils";
 
