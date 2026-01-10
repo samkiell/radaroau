@@ -24,6 +24,7 @@ export default function Overview() {
     if (!hydrated) return;
 
     async function fetchOverview() {
+      setLoading(true);
       try {
         setLoading(true);
 

@@ -13,7 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { motion } from "framer-motion";
 import useAuthStore from "@/store/authStore";
@@ -41,6 +41,14 @@ const OrganizationDashboardNavLinks = [
 
 const Sidebar = () => {
   const location = usePathname();
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
   const active = OrganizationDashboardNavLinks.find(
     (link) => location === `${link.link}`
   );
@@ -98,12 +106,14 @@ const Sidebar = () => {
             }`}
           >
             <Settings />
-            <span className="text-xs">Settings</span>
-          </Link>
-          <button 
-            onClick={() => useAuthStore.getState().logout()}
-            className="flex items-center gap-3 p-2 rounded-lg text-red-500 hover:bg-gray-800"
-          >
+          </span>
+          <p>Settings</p>
+        </Link>
+        <button 
+          onClick={handleLogout}
+          className="hover:bg-gray-200 p-2 md:p-2 hover:rounded-xl font-bold md:flex md:flex-row hidden md:gap-3 items-center text-red-500 cursor-pointer w-full text-left"
+        >
+          <span>
             <LogOut />
             <span className="text-sm">Logout</span>
           </button>

@@ -18,6 +18,7 @@ const LoginPage = () => {
   const router = useRouter();
   const login = useAuthStore((state) => state.login);
 
+  const [role, setRole] = useState("Student");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -115,7 +116,7 @@ const LoginPage = () => {
       console.error("Login error:", err);
       const message = err.response?.data?.error || "Invalid email or password";
       setError(message);
-      toast.error(message);
+      toast.error(message, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -161,6 +162,31 @@ const LoginPage = () => {
           <p className="text-sm md:text-base text-gray-400 mb-6 md:mb-8 text-center">
             Sign in to get your tickets
           </p>
+
+           {/* Role Switch */}
+          <div className="flex gap-2 mb-6 md:mb-8">
+            <button
+              onClick={() => setRole("Student")}
+           className={`flex-1 py-2 md:py-3 px-4 md:px-6 rounded-full font-semibold text-sm md:text-base transition-all duration-200 ${
+                role === "Student"
+                  ? "bg-yellow-400 text-black border-yellow-400"
+                  : "border-gray-600 border text-gray-300 hover:border-gray-500"
+              }`}
+              >
+              Student  
+            </button>
+
+            <button
+              onClick={() => setRole("Organizer")}
+              className={`flex-1 py-2 md:py-3 px-4 md:px-6 rounded-full font-semibold text-sm md:text-base transition-all duration-200 ${
+                role === "Organizer"
+                  ? "bg-yellow-400 text-black border-yellow-400"
+                  : "border-gray-600 border text-gray-300 hover:border-gray-500"
+              }`}
+            >
+              Organizer
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
             {/* Email Field */}
@@ -276,6 +302,7 @@ const LoginPage = () => {
             </div>
 
             {/* Social Login Option */}
+            {role === "Organizer" && (
                    <Button
                       variant="outline"
                       onClick={() => handleGoogleLogin()}
@@ -291,6 +318,7 @@ const LoginPage = () => {
                         <span className="text-sm md:text-base">Continue with Google</span>
                       </div>
                     </Button>
+            )}
           </div>
         </div>
       </motion.div>

@@ -12,6 +12,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { Mail, Lock, User, Eye, EyeOff, UsersIcon, Loader2, ArrowRight, Phone } from "lucide-react";
 import Logo from "@/components/Logo";
 import BackgroundCarousel from "../../../components/BackgroundCarousel";
+import axios from 'axios';
 
 const SignUp = () => {
   const router = useRouter();
@@ -71,7 +72,6 @@ const SignUp = () => {
   };
 
 
-
   const submitForm = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -128,23 +128,59 @@ const SignUp = () => {
     }
   };
 
+
+
+
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
+      console.log("Google OAuth Success. Token Response:", tokenResponse);
       setLoading(true);
+      const toastId = toast.loading('Authenticating with Google...');
       try {
-        const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
-        const res = await api.post(endpoint, {
-          token: tokenResponse.access_token,
+        // 1. Fetch User Info using the access token
+        const userInfoResponse = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
 
-        const { message, email, access, refresh } = res.data;
+        const googleUser = userInfoResponse.data;
+        console.log("Google User Info:", googleUser);
+        const googleId = googleUser.sub; // 'sub' is the unique Google ID
+
+        const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
+        console.log(`Sending request to: ${endpoint}`);
+        
+        // REVERTING: Sending access_token because the backend error "Wrong number of segments" 
+        // indicates it wants a JWT. Access tokens from Google aren't JWTs, but ID Tokens are.
+        // Since we can't easily get an ID Token with this custom UI, we send the access_token 
+        // and hope the backend can validate it (or needs to be fixed to do so).
+        // If the backend strictly requires an ID Token, we might need to use the standard Google Login button.
+        const payloadToken = tokenResponse.access_token; 
+        
+        console.log("Payload:", { token: payloadToken }); 
+        
+        const res = await api.post(endpoint, {
+          token: payloadToken,
+        });
+
+        console.log("Backend Response:", res.data);
+
+        const { email, access, refresh, is_new_user } = res.data;
+        // The backend likely returns the user role or we infer it from the context
         loginUser({ email }, access, refresh, role);
 
-        toast.success(message || 'Account Created Successfully');
+        if (is_new_user) {
+          toast.success('Account Created Successfully', { id: toastId });
+        } else {
+          toast.success('Login Successful', { id: toastId });
+        }
         router.push("/dashboard");
       } catch (err) {
-        console.error('Google signup error:', err);
-        toast.error(err.response?.data?.error || "Google signup failed");
+        console.error('Google signup error object:', err);
+        console.log('Error Response Data:', err.response?.data);
+        console.log('Error Status:', err.response?.status);
+        console.log('Error Headers:', err.response?.headers);
+        
+        toast.error(err.response?.data?.error || "Google signup failed", { id: toastId });
       } finally {
         setLoading(false);
       }
@@ -434,24 +470,14 @@ const SignUp = () => {
               </span>
             </div>
 
-              {/* --- Social Login Buttons --- */}
+      {/* --- Social Login Buttons --- */}
+            {role === "Organizer" && (
         <div className="flex gap-4 justify-center mb-4">
-            {/* <button
-                type="button"
-                onClick={() => handleSocialLogin('Google')}
-                disabled={loading}
-                className="w-12 h-12 bg-white rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95 group"
-                title="Sign up with Google"
-            >
-                 <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" className="w-5 h-5 group-hover:scale-110 transition-transform"/>
-            </button> */}
-
                 <Button
               variant="outline"
               type="button"
-              onClick={() => handleSocialLogin('Google')}
-              disabled={loading}
-              className="w-full h-10 md:h-12 rounded-xl border-gray-800 bg-zinc-900 hover:bg-zinc-800 text-gray-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => googleLogin()}
+              className="w-full h-10 md:h-12 rounded-xl border-gray-800 bg-zinc-900 hover:bg-zinc-800 text-gray-300 transition-all duration-200"
             >
               <div className="flex items-center justify-center gap-3">
                 <div className="h-4 w-4 md:h-5 md:w-5 flex items-center justify-center">
@@ -464,6 +490,7 @@ const SignUp = () => {
               </div>
             </Button>
         </div>
+            )}
           </form>
 
           {/* Already have an account? Sign in */}
