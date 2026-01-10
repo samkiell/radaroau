@@ -30,6 +30,7 @@ const EventDetailsPage = () => {
   
   // Booking state
   const [quantity, setQuantity] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [copied, setCopied] = useState(false);
 
@@ -49,6 +50,13 @@ const EventDetailsPage = () => {
       try {
         const response = await api.get(`/events/${eventId}/details/`);
         setEvent(response.data);
+        // Set default category if available
+        if (response.data.ticket_categories && response.data.ticket_categories.length > 0) {
+          const activeCategories = response.data.ticket_categories.filter(c => c.is_active && !c.is_sold_out);
+          if (activeCategories.length > 0) {
+            setSelectedCategory(activeCategories[0]);
+          }
+        }
       } catch (error) {
         console.error("Error fetching event details:", error);
         toast.error("Failed to load event details");
@@ -78,6 +86,7 @@ const EventDetailsPage = () => {
       const payload = {
         event_id: eventId,
         quantity: parseInt(quantity),
+        category_name: selectedCategory?.name,
         seat_number: selectedSeat
       };
 
@@ -208,6 +217,40 @@ const EventDetailsPage = () => {
                 </Select>
               </div>
 
+              {/* Category Selector */}
+              {event.ticket_categories && event.ticket_categories.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-xs md:text-sm">Ticket Category</Label>
+                  <Select 
+                    value={selectedCategory?.name || ""} 
+                    onValueChange={(val) => {
+                      const cat = event.ticket_categories.find(c => c.name === val);
+                      setSelectedCategory(cat);
+                    }}
+                  >
+                    <SelectTrigger id="category" className="h-9 md:h-10 text-sm md:text-base w-full">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {event.ticket_categories.map((cat) => (
+                        <SelectItem 
+                          key={cat.category_id} 
+                          value={cat.name}
+                          disabled={!cat.is_active || cat.is_sold_out}
+                        >
+                          {cat.name} - ₦{parseFloat(cat.price).toLocaleString()} {cat.is_sold_out ? "(Sold Out)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedCategory?.description && (
+                    <p className="text-[10px] md:text-xs text-muted-foreground italic">
+                      {selectedCategory.description}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {/* Seat Selection */}
               {event.allows_seat_selection && (
                 <div className="space-y-3">
@@ -250,7 +293,7 @@ const EventDetailsPage = () => {
                   <span>
                     {event.pricing_type === 'free' 
                       ? 'Free' 
-                      : `₦${(event.price * quantity).toLocaleString()}`}
+                      : `₦${((selectedCategory ? parseFloat(selectedCategory.price) : event.price) * quantity).toLocaleString()}`}
                   </span>
                 </div>
               </div>
