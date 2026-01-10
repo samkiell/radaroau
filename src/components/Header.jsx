@@ -50,50 +50,54 @@ const Header = () => {
           <Link href="/" onClick={closeMenu}>
             <Logo />
           </Link>
+          
+          {user ? (
+            <>
+              {!pathname.startsWith('/dashboard') && (
+                <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  Dashboard
+                </Link>
+              )}
+              <div className="flex items-center gap-4">
+                 <span className="text-sm text-muted-foreground">Hi, {user.email?.split('@')[0]}</span>
+                 {!pathname.startsWith('/dashboard') && (
+                   <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogout}
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                   >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Logout
+                   </Button>
+                 )}
+              </div>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" className="text-gray-300 hover:text-white">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button className="bg-rose-600 hover:bg-rose-700 text-white">
+                  Sign Up
+                </Button>
+              </Link>
+            </>
+          )}
+        </nav>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/events" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Discover Events
-            </Link>
-            
-            {user ? (
-              <>
-                {!pathname.startsWith('/dashboard') && (
-                  <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-                    Dashboard
-                  </Link>
-                )}
-                <div className="flex items-center gap-4">
-                   <span className="text-sm text-muted-foreground">Hi, {user.email?.split('@')[0]}</span>
-                   {!pathname.startsWith('/dashboard') && (
-                     <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={handleLogout}
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                     >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                     </Button>
-                   )}
-                </div>
-              </>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" className="text-gray-300 hover:text-white">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-rose-600 hover:bg-rose-700 text-white">
-                    Sign Up
-                  </Button>
-                </Link>
-              </>
-            )}
-          </nav>
+        {/* Mobile Hamburger Menu Button */}
+        {/* <button
+          className="md:hidden p-2 text-gray-300 hover:text-white focus:outline-none"
+          onClick={toggleMenu}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button> */}
+      </div>
 
           {/* Mobile Hamburger Menu Button */}
           <button

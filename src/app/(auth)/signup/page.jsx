@@ -45,6 +45,14 @@ const SignUp = () => {
   const organiserPasswordMismatch =
     organiserConfirm.length > 0 && organiserConfirm !== organiserPassword;
 
+ 
+  const validatePhone = (phone) => {
+    const phoneRegex = /^(\+234|234|0)(7\d|8\d|9\d)\d{8}$/;
+    return phoneRegex.test(phone.replace(/\s+/g, ''));
+  };
+
+  const invalidPhone = organiserPhone.length > 0 && !validatePhone(organiserPhone);
+
   const isFormValid = () => {
     if (role === "Student") {
       return (
@@ -57,7 +65,8 @@ const SignUp = () => {
       return (
         organisationName.trim() &&
         organiserEmail.trim() &&
-        organiserPassword.length >= 6 
+        organiserPhone.trim() &&
+        organiserPassword.length >= 6
       );
     }
   };
@@ -90,19 +99,25 @@ const SignUp = () => {
         };
         endpoint = "/organizer/register/";
       }
-      
+
+      // write a toast if the student put in a non .oauife.edu.ng email
+      if (role === "Student" && !email.endsWith("@student.oauife.edu.ng")) {
+        toast.error("Please use your valid student email address.", { id: toastId });
+        setLoading(false);
+        return;
+      } else {
+        toast.dismiss(toastId);
+      }
+
       console.log("Submitting to", endpoint, "with payload", payload);
       const res = await api.post(endpoint, payload);
-      
+
+      // Both student and organizer now require OTP verification
+      toast.success(res.data.message || 'OTP sent to email.', { id: toastId });
       if (role === "Student") {
-         toast.success(res.data.message || 'OTP sent to email.', { id: toastId })
-         router.push(`/verify-otp?email=${email}`);
+        router.push(`/verify-otp?email=${email}&role=student`);
       } else {
-         // Organizer registration is immediate
-         const { email, access, refresh, role: respRole } = res.data;
-         loginUser({ email }, access, refresh, respRole || role);
-         toast.success('Account Created Successfully', { id: toastId })
-         router.push("/dashboard");
+        router.push(`/verify-otp?email=${organiserEmail}&role=organizer`);
       }
 
     } catch (err) {
@@ -170,11 +185,17 @@ const SignUp = () => {
         setLoading(false);
       }
     },
-    onError: (errorResponse) => {
-        console.error("Google OAuth Failed (Client Side):", errorResponse);
-        toast.error('Google signup failed');
+    onError: () => {
+      toast.error('Google signup failed');
+      setLoading(false);
     },
   });
+
+  const handleSocialLogin = (provider) => {
+    if (provider === 'Google') {
+      googleLogin();
+    }
+  }
 
   return (
     <div className="min-h-screen w-full flex bg-[#0A0A14]">
@@ -184,12 +205,6 @@ const SignUp = () => {
           images={['/IMG (1).jpg', '/ticket image (1).jpeg']}
           interval={5000}
         />
-        {/* <div className="relative z-10 w-[40%] flex items-center justify-center">
-          <img
-            alt="Center Image"
-            src='/assets/image 2 (1).png'
-          />
-        </div> */}
       </div>
 
       <motion.div
@@ -381,7 +396,7 @@ const SignUp = () => {
                   {/* Phone */}
                   <div>
                     <label className="block text-white/80 text-[10px] md:text-xs font-semibold uppercase tracking-wide mb-1 md:mb-2">
-                      Phone Number
+                      Phone Number *
                     </label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 h-4 w-4 md:h-5 md:w-5" />
@@ -389,12 +404,17 @@ const SignUp = () => {
                         type="tel"
                         id="phone"
                         name="phone"
-                        placeholder="Enter phone number"
+                        placeholder="+2348012345678"
                         value={organiserPhone}
                         onChange={(e) => setOrganiserPhone(e.target.value)}
                         className="w-full bg-transparent border border-gray-200 dark:border-gray-800 rounded-xl py-3 md:py-3.5 pl-10 md:pl-12 pr-4 text-sm md:text-base text-white hover:border-rose-500/60 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all duration-200 dark:placeholder:text-gray-600"
                       />
                     </div>
+                    {invalidPhone && (
+                      <p className="text-red-500 text-[10px] md:text-xs mt-1">
+                        Phone number must be a valid Nigerian number (e.g., 08012345678 or +23480...).
+                      </p>
+                    )}
                   </div>
 
                   {/* Password */}

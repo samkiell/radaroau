@@ -8,10 +8,11 @@ import { Mail, Lock, Loader2, User, Sparkles, Eye, EyeOff, Check, ArrowRight } f
 import toast from 'react-hot-toast'
 import api from '../../../lib/axios'
 import useAuthStore from '../../../store/authStore'
-import { useGoogleLogin } from '@react-oauth/google';
 import { Button } from '../../../components/ui/button'
 import Logo from '@/components/Logo'
-import BackgroundCarousel from '../../../components/BackgroundCarousel'
+import { getErrorMessage } from '@/lib/utils'
+import BackgroundCarousel from '@/components/BackgroundCarousel'
+import { useGoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -52,42 +53,60 @@ const LoginPage = () => {
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      const toastId = toast.loading("Logging in with Google...");
+      setLoading(true);
       try {
-        const endpoint = role === "Student" ? '/student/google-signup/' : '/organizer/google-signup/';
-        const res = await api.post(endpoint, {
+        // For login, we use the general login endpoint that can handle both student and organizer
+        const res = await api.post("/login/google/", {
           token: tokenResponse.access_token,
         });
-        const { user_id, email, access, refresh, role: responseRole } = res.data;
-        login({ user_id, email }, access, refresh, responseRole || role);
-        toast.success("Login successful!", { id: toastId });
+        const { user_id, email, access, refresh, role } = res.data;
+        login({ user_id, email }, access, refresh, role);
+        toast.success("Login successful!");
         router.push("/dashboard");
       } catch (err) {
         console.error("Google login error:", err);
-        console.log("Error details:", err.response?.data);
-        toast.error("Google login failed", { id: toastId });
+        toast.error(err.response?.data?.error || "Google login failed");
+      } finally {
+        setLoading(false);
       }
     },
     onError: () => {
       toast.error("Google login failed");
+      setLoading(false);
     },
   });
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError('')
     const toastId = toast.loading('Logging in...')
 
-       try {
+    try {
       const response = await api.post('/login/', formData)
       const { user_id, email, access, refresh, role: responseRole } = response.data
-
+      
       let userRole = responseRole;
       if (!userRole && access) {
         const decoded = parseJwt(access);
         // Check for common role claims
-        userRole = decoded?.role || decoded?.user_type || (decoded?.is_organizer ? 'organizer' : 'student');
+        userRole = decoded?.role || decoded?.user_type;
+        
+        // If still not found, check specific boolean flags if they exist
+        if (!userRole && decoded?.is_organizer) {
+            userRole = 'organizer';
+        }
+      }
+
+      // Fallback: Check email domain if role is still not determined
+      if (!userRole) {
+          if (email.endsWith('@student.oauife.edu.ng')) {
+              userRole = 'student';
+          } else {
+              // Default to organizer if not a student email 
+              // (since organizers can have generic emails like Gmail, Yahoo, etc.)
+              userRole = 'organizer';
+          }
       }
 
       login({ user_id, email }, access, refresh, userRole)
@@ -106,13 +125,19 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen w-full flex bg-[#0A0A14]">
 
-            {/* left Side - Image */}
-      <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden group">
-        <BackgroundCarousel
-          images={['/IMG (1).jpg', '/ticket image (1).jpeg']}
-          interval={5000}
-        />
-      </div>
+            {/* Left Image */}
+             <div className="hidden lg:flex w-1/2 relative items-center justify-center overflow-hidden group">
+               <BackgroundCarousel
+                 images={['/IMG (1).jpg', '/ticket image (1).jpeg']}
+                 interval={5000}
+               />
+               {/* <div className="relative z-10 w-[40%] flex items-center justify-center">
+                 <img
+                   alt="Center Image"
+                   src='/assets/image 2 (1).png'
+                 />
+               </div> */}
+             </div>
       {/* Right Side - Form */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -287,7 +312,7 @@ const LoginPage = () => {
                         <div className="h-4 w-4 md:h-5 md:w-5 flex items-center justify-center">
                           <img
                            src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-                            alt="Google"
+                            alt="Google" 
                           />
                         </div>
                         <span className="text-sm md:text-base">Continue with Google</span>

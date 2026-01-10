@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../../../../lib/axios";
 import toast from "react-hot-toast";
+import useOrganizerStore from "../../../../../store/orgStore";
+import Select from "../../../../../components/ui/Select";
+import Loading from "@/components/ui/Loading";
 
 const FALLBACK_EVENT_TYPES = [
   { value: "conference", label: "Conference" },
@@ -15,6 +18,7 @@ const FALLBACK_EVENT_TYPES = [
 
 export default function CreateEvent() {
   const router = useRouter();
+  const { triggerRefetch } = useOrganizerStore();
 
   const [configLoading, setConfigLoading] = useState(true);
   const [eventTypes, setEventTypes] = useState(FALLBACK_EVENT_TYPES);
@@ -183,7 +187,9 @@ export default function CreateEvent() {
 
       if (res && res.status >= 200 && res.status < 300) {
         toast.success("Event created successfully");
+        triggerRefetch(); // Trigger overview data refetch
         resetForm();
+        router.push('/dashboard/org/my-event');
       } else {
         setServerError(`Unexpected server response: ${res?.status}`);
       }
@@ -210,6 +216,10 @@ export default function CreateEvent() {
       return iso;
     }
   };
+
+  if (configLoading) {
+    return <Loading />;
+  }
 
   return (
     <main
@@ -324,21 +334,17 @@ export default function CreateEvent() {
                     <label className="block text-sm font-medium text-slate-300">
                       Event type <span className="text-rose-500">*</span>
                     </label>
-                    <select
+                    <Select
+                      label=""
                       value={form.event_type}
-                      onChange={handleChange("event_type")}
-                      className="mt-2 w-full rounded-xl bg-transparent border border-slate-800/60 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-(--sidebar-accent,#5b21b6)"
-                    >
-                      {eventTypes.map((t) => (
-                        <option
-                          key={t.value}
-                          value={t.value}
-                          className="bg-slate-900 text-slate-200"
-                        >
-                          {t.label}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(value) => {
+                          setForm(s => ({ ...s, event_type: value }));
+                          setErrors(p => ({ ...p, event_type: undefined }));
+                      }}
+                      options={eventTypes}
+                      className="mt-2"
+                      placeholder="Select event type"
+                    />
                     {configLoading && (
                       <p className="mt-1 text-xs text-slate-500">
                         Loading types…

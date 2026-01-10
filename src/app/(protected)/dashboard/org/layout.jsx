@@ -1,14 +1,18 @@
-import Sidebar from "@/components/organizersDashboardComponents/Sidebar"
+import Sidebar from "@/components/organizersDashboardComponents/sidebar"
+import OrganizerHeader from "@/components/OrganizerHeader"
 import React from 'react'
 
 const organizersDashboardLayout = ({children}) => {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-background">
-      {/* Sidebar Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-sm border-t border-gray-800 p-2 md:static md:w-64 md:min-h-screen md:bg-black md:border-r md:border-t-0 md:p-6">
-        <div className="md:sticky md:top-24">
-          <Sidebar />
-        </div>
+   <>
+    {/* Mobile Header - only visible on mobile */}
+    <div className="md:hidden">
+      <OrganizerHeader />
+    </div>
+    <section className='flex flex-col md:flex-row min-h-screen  bg-black border-r border-gray-900 md:p-5 text-foreground gap-6'>
+      {/* sidebar content */}
+ <nav className='fixed bottom-0 w-full mt-20 p-2 rounded-xl md:mt-4 md:left-0 md:pt-10 md:w-66 lg:w-65 border-border md:min-h-screen order-1 z-10'>
+        <Sidebar />
       </nav>
 
       {/* Main Content Area */}
