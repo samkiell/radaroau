@@ -102,16 +102,32 @@ const Header = () => {
           {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button> */}
 
-          {/* Mobile Hamburger Menu Button - Hidden for Students (they have bottom nav) */}
-          {(!isAuthenticated || (isAuthenticated && role !== 'student')) && (
-            <button
-              className="md:hidden p-2 text-gray-300 hover:text-white focus:outline-none"
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          )}
+          {/* Mobile Actions */}
+          <div className="md:hidden flex items-center gap-2">
+            
+            {/* Student Mobile Logout */}
+            {isAuthenticated && role === 'student' && (
+               <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleLogout}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+               >
+                  <LogOut className="h-5 w-5" />
+               </Button>
+            )}
+
+            {/* Mobile Hamburger Menu Button - Hidden for Students */}
+            {(!isAuthenticated || (isAuthenticated && role !== 'student')) && (
+              <button
+                className="p-2 text-gray-300 hover:text-white focus:outline-none"
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
+            )}
+          </div>
         </div>
       </header>
       
