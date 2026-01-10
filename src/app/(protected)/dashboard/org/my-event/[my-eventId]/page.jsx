@@ -3,6 +3,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import api from "../../../../../../lib/axios";
+import { Copy, ArrowLeft, Edit2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function EventDetailsPage() {
   const router = useRouter();
@@ -22,6 +24,16 @@ export default function EventDetailsPage() {
     } catch {
       return iso;
     }
+  };
+
+  const handleCopyLink = () => {
+    if (!event) return;
+    const link = `${window.location.origin}/events/${id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      toast.success("Link copied to clipboard!");
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
   };
 
   const fetchEvent = useCallback(async () => {
@@ -170,9 +182,17 @@ export default function EventDetailsPage() {
                   Edit
                 </button>
                 <button
-                  onClick={() => router.back()}
-                  className="px-4 py-2 rounded-xl border border-slate-700"
+                  onClick={handleCopyLink}
+                  className="px-4 py-2 rounded-xl bg-white/5 border border-slate-700 text-slate-100 hover:bg-slate-800 flex items-center gap-2"
                 >
+                  <Copy className="h-4 w-4" />
+                  Copy Link
+                </button>
+                <button
+                  onClick={() => router.back()}
+                  className="px-4 py-2 rounded-xl border border-slate-700 flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
                   Back
                 </button>
               </div>

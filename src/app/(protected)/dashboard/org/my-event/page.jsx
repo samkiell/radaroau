@@ -3,7 +3,8 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import api from "../../../../../lib/axios";
-import { Loader2 } from "lucide-react";
+import { Loader2, Copy, Check, ExternalLink } from "lucide-react";
+import toast from "react-hot-toast";
 
 const MyEvent = () => {
   const router = useRouter();
@@ -54,6 +55,16 @@ const MyEvent = () => {
     } catch {
       return iso;
     }
+  };
+
+  const handleCopyLink = (e, eventId) => {
+    e.stopPropagation();
+    const link = `${window.location.origin}/events/${eventId}`;
+    navigator.clipboard.writeText(link).then(() => {
+      toast.success("Link copied to clipboard!");
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
   };
 
 
@@ -162,6 +173,25 @@ const MyEvent = () => {
                             <p className="text-sm text-slate-400 flex items-center gap-1">
                               {formattedDate(ev.date)}
                             </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => handleCopyLink(e, id)}
+                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors border border-white/5"
+                              title="Copy Public Ticket Link"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </button>
+                            {/* <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.open(`/events/${id}`, '_blank');
+                              }}
+                              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors border border-white/5"
+                              title="Preview Public Page"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </button> */}
                           </div>
                         </div>
 
