@@ -75,6 +75,7 @@ const Header = () => {
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Logout
+<<<<<<< HEAD
                     </Button>
                   )}
                 </div>
@@ -94,6 +95,27 @@ const Header = () => {
               </>
             )}
           </nav>
+=======
+                   </Button>
+                 )}
+              </div>
+            </>
+          ) : (
+            <>
+              <Link href="/login">
+                <Button variant="ghost" className="text-gray-300 hover:text-white">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button className="bg-rose-600 hover:bg-rose-700 text-white">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
+        </nav>
+>>>>>>> a4cb2d68ecbdc5cae113311945fd549de6efea96
 
           {/* Mobile Hamburger Menu Button */}
           {/* <button
@@ -246,7 +268,7 @@ const Header = () => {
                       </Link>
                       <Link href="/signup" onClick={closeMenu}>
                         <Button className="w-full bg-rose-600 hover:bg-rose-700 text-white h-12">
-                          Sign Up
+                          Get Started
                         </Button>
                       </Link>
                     </div>
