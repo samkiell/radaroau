@@ -105,18 +105,18 @@ const Sidebar = () => {
                 : 'text-gray-200 hover:bg-gray-800'
             }`}
           >
-            <Settings />
-          </span>
-          <p>Settings</p>
+                <Settings />
+                <span className="text-xs">Settings</span>
         </Link>
         <button 
           onClick={handleLogout}
           className="hover:bg-gray-200 p-2 md:p-2 hover:rounded-xl font-bold md:flex md:flex-row hidden md:gap-3 items-center text-red-500 cursor-pointer w-full text-left"
         >
-          <span>
+          <span className="flex items-center gap-3">
             <LogOut />
             <span className="text-sm">Logout</span>
-          </button>
+          </span>
+        </button>
         </div>
       </aside>
     </>
