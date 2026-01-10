@@ -46,18 +46,13 @@ function getRefreshToken() {
 api.interceptors.request.use(
   (config) => {
     const token = getToken();
-    // Do not attach token for public GET endpoints (like /event/)
-    const isPublicEventGet =
-      config.method?.toLowerCase() === "get" &&
-      (config.url?.includes("/event/") || config.url?.includes("/events/"));
-
     // Do not attach token for auth endpoints
     const isAuthEndpoint =
       config.url?.includes("/login/") ||
       config.url?.includes("/signup/") ||
       config.url?.includes("/token/refresh/");
 
-    if (token && !isPublicEventGet && !isAuthEndpoint) {
+    if (token && !isAuthEndpoint) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -130,7 +125,7 @@ api.interceptors.response.use(
                 parsed.state.token = newAccess;
                 localStorage.setItem("auth-storage", JSON.stringify(parsed));
               }
-            } catch { }
+            } catch {}
 
             // Update default header for future requests
             api.defaults.headers.Authorization = `Bearer ${newAccess}`;
@@ -173,8 +168,22 @@ api.interceptors.response.use(
         errorMessage === "token_not_valid"
       ) {
         useAuthStore.getState().logout();
-        // Optionally redirect to login
-        if (typeof window !== "undefined") {
+
+        // Define public paths that shouldn't force a redirect to login
+        const publicPaths = [
+          "/",
+          "/events",
+          "/login",
+          "/signup",
+          "/verify-otp",
+        ];
+        const currentPath =
+          typeof window !== "undefined" ? window.location.pathname : "";
+        const isPublicPath =
+          publicPaths.includes(currentPath) ||
+          currentPath.startsWith("/events/");
+
+        if (typeof window !== "undefined" && !isPublicPath) {
           window.location.href = "/login";
         }
       }
