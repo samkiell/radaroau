@@ -7,6 +7,7 @@ import { Loader2, MapPin, Calendar as CalendarIcon, Search, ArrowLeft } from "lu
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import PublicNavbar from "@/components/PublicNavbar";
 
 const PublicEventsPage = () => {
   const [events, setEvents] = useState([]);
@@ -16,8 +17,11 @@ const PublicEventsPage = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await api.get("/create-event/");
-        setEvents(response.data);
+        const response = await api.get("/event/");
+        const eventsData = Array.isArray(response.data) ? response.data : (response.data.events || []);
+        // Only show verified events to public
+        const verifiedEvents = eventsData.filter(event => !event.status || event.status === 'verified');
+        setEvents(verifiedEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
       } finally {
@@ -34,6 +38,7 @@ const PublicEventsPage = () => {
 
   return (
     <div className="min-h-screen bg-[#0A0A14] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]">
+      <PublicNavbar />
       <div className="container mx-auto px-4 pt-20 pb-12 md:pt-28 md:pb-16">
         {/* Header & Search */}
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between mb-12">
@@ -98,7 +103,7 @@ const PublicEventsPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
-                    <Link href={`/dashboard/student/events/${event.event_id}`}>
+                    <Link href={`/events/${event.event_id}`}>
                       <div className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#0F0F16] border border-white/10 cursor-pointer hover:border-primary/50 transition-all duration-300 shadow-xl">
                         {/* Background Image */}
                         {event.event_image ? (
