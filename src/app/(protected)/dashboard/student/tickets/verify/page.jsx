@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import api from "@/lib/axios";
 import { Loader2, CheckCircle2, XCircle, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
-const VerifyPaymentPage = () => {
+const VerifyPaymentContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reference = searchParams.get("reference");
@@ -122,6 +122,18 @@ const VerifyPaymentPage = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const VerifyPaymentPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <VerifyPaymentContent />
+    </Suspense>
   );
 };
 
