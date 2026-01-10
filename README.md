@@ -1,45 +1,180 @@
-# Radar - Frontend
+# Radar - Modern Event Ticketing Platform
 
-Radar is a modern ticketing platform designed to streamline event management and ticket purchasing. This repository contains the frontend application built with Next.js.
+Radar is a comprehensive event ticketing platform designed to streamline event management and ticket purchasing. Built with modern web technologies, it provides a seamless experience for event organizers, students, and administrators.
 
 ## 🚀 Tech Stack
 
-- **Framework:** [Next.js](https://nextjs.org/) (React)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components:** [Shadcn UI](https://ui.shadcn.com/)
+- **Framework:** [Next.js 16](https://nextjs.org/) with App Router
+- **Language:** React 19.2
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com/)
+- **UI Components:** Custom components + [Radix UI](https://www.radix-ui.com/) primitives
 - **Icons:** [Lucide React](https://lucide.dev/)
 - **State Management:** [Zustand](https://github.com/pmndrs/zustand)
 - **Animations:** [Framer Motion](https://www.framer.com/motion/)
-- **HTTP Client:** [Axios](https://axios-http.com/)
+- **HTTP Client:** [Axios](https://axios-http.com/) with interceptors for auth
+- **Authentication:** Google OAuth + JWT
+- **Forms:** [React Hook Form](https://react-hook-form.com/)
+- **Notifications:** [React Hot Toast](https://react-hot-toast.com/)
+- **Theme:** Dark/Light mode with [next-themes](https://github.com/pacocoursey/next-themes)
 
 ## 🛠️ Getting Started
 
+### Prerequisites
 
+- Node.js 18.x or higher
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd Frontend
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Set up environment variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# API Configuration
+NEXT_PUBLIC_API_URL=https://radar-ufvb.onrender.com/
+
+# Google OAuth (optional - for Google Sign-in)
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id_here
+
+# App URL (for metadata and SEO)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+4. Run the development server
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Build for Production
+
+```bash
+npm run build
+npm start
+```
 
 ## 📂 Project Structure
 
 ```
 src/
-├── app/                # Next.js App Router pages and layouts
-│   ├── login/          # Login page
-│   ├── signup/         # Signup page
-│   └── ...
-├── components/         # Reusable UI components
-│   ├── ui/             # Shadcn UI primitives
-│   └── ...
-├── lib/                # Utilities and configurations (axios, utils)
-├── store/              # Zustand state stores
-└── ...
+├── app/                          # Next.js App Router
+│   ├── (auth)/                   # Authentication routes (login, signup, verify-otp)
+│   ├── (protected)/              # Protected routes (dashboards)
+│   │   └── dashboard/
+│   │       ├── org/              # Organizer dashboard
+│   │       │   ├── create-event/
+│   │       │   ├── my-event/
+│   │       │   ├── qr-scanner/
+│   │       │   └── settings/
+│   │       └── student/          # Student dashboard
+│   │           ├── events/
+│   │           └── my-tickets/
+│   ├── events/                   # Public events pages
+│   ├── contact/                  # Contact page
+│   ├── terms/                    # Terms of service
+│   ├── privacy/                  # Privacy policy
+│   ├── lighthouse/               # Admin panel
+│   ├── layout.jsx                # Root layout with providers
+│   ├── page.jsx                  # Landing page
+│   └── globals.css               # Global styles
+├── components/                   # Reusable components
+│   ├── ui/                       # Base UI components (buttons, inputs, etc.)
+│   ├── admin/                    # Admin-specific components
+│   ├── organizersDashboardComponents/
+│   ├── studentDashboardComponents/
+│   ├── ErrorBoundary.jsx         # Error boundary for error handling
+│   ├── Header.jsx                # Main navigation
+│   └── Footer.jsx                # Footer
+├── lib/                          # Utilities and configurations
+│   ├── axios.js                  # Axios instance with auth interceptors
+│   ├── utils.js                  # Utility functions (cn, getImageUrl, etc.)
+│   └── admin.js                  # Admin utilities
+└── store/                        # Zustand state stores
+    ├── authStore.js              # Authentication state
+    └── orgStore.js               # Organizer state
 ```
 
-## 📅 Week 1 Deliverables
+## 🔑 Key Features
 
-- [x] **Login Page:** Fully functional with UI/UX implementation.
-- [ ] **Signup Page:** Registration functionality.
-- [ ] **Logout Functionality:** Secure session termination.
-- [x] **Protected Routes:** Route guarding for authenticated users.
-- [x] **Axios Instance:** Configured with interceptors for auth tokens.
-- [x] **Project Structure:** Organized folder hierarchy.
+### For Event Organizers
+- Create and manage events
+- Track ticket sales and revenue
+- QR code scanner for ticket validation
+- Payout management
+- Event analytics dashboard
+
+### For Students
+- Browse and discover events
+- Purchase tickets
+- Manage purchased tickets
+- View ticket QR codes
+
+### For Admins
+- User management
+- Event verification and moderation
+- Platform analytics
+- System administration
+
+## 🔐 Security Features
+
+- JWT-based authentication with automatic token refresh
+- Secure HTTP-only cookies approach (token stored in localStorage with secure handling)
+- Protected routes with authentication middleware
+- Security headers (CSP, X-Frame-Options, etc.)
+- Input validation and sanitization
+
+## 🎨 Design System
+
+The app uses a custom design system with:
+- CSS custom properties for theming
+- Dark/light mode support
+- Consistent color palette (primary: Rose-600 #e11d48)
+- Custom fonts: Plus Jakarta Sans (body), Geist Mono (code)
+- Responsive design for mobile, tablet, and desktop
+
+## 📊 State Management
+
+- **Zustand** for global state (auth, org data)
+- **React Hook Form** for form state
+- **URL state** for filters and pagination
+- **Server state** cached via Next.js
+
+## 🚦 Route Protection
+
+Routes are protected based on user roles:
+- Public routes: `/`, `/events`, `/login`, `/signup`
+- Student routes: `/dashboard/student/*`
+- Organizer routes: `/dashboard/org/*`
+- Admin routes: `/lighthouse/*`
+
+## 🧪 Performance Optimizations
+
+- Next.js Image component for optimized images
+- Code splitting with dynamic imports
+- Route prefetching
+- Optimized bundle with tree shaking
+- Error boundaries for graceful error handling
+
+## 🌐 API Integration
+
+The frontend communicates with a Django REST Framework backend:
+- Base URL: `https://radar-ufvb.onrender.com/`
+- Axios interceptors handle authentication
+- Automatic token refresh on 401 errors
+- Proper error handling and user feedback
 
 ## 👥 Contributors
 
@@ -49,4 +184,8 @@ src/
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+**Built with ❤️ by the Radar Team**
