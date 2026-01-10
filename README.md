@@ -126,7 +126,7 @@ Routes are protected based on user roles:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary and confidential. All rights reserved.
 
 ---
 
