@@ -3,7 +3,9 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import api from "../../../../../../lib/axios";
-import { ChevronLeft, Edit, Ticket, FileText, BarChart3, ArrowRight } from "lucide-react";
+import { Copy, ArrowLeft, Edit2 } from "lucide-react";
+import toast from "react-hot-toast";
+import { getImageUrl } from "../../../../../../lib/utils";
 
 export default function EventDetailsPage() {
   const router = useRouter();
@@ -23,6 +25,16 @@ export default function EventDetailsPage() {
     } catch {
       return iso;
     }
+  };
+
+  const handleCopyLink = () => {
+    if (!event) return;
+    const link = `${window.location.origin}/events/${id}`;
+    navigator.clipboard.writeText(link).then(() => {
+      toast.success("Link copied to clipboard!");
+    }).catch(() => {
+      toast.error("Failed to copy link");
+    });
   };
 
   const fetchEvent = useCallback(async () => {
@@ -162,39 +174,45 @@ export default function EventDetailsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 ml-9 md:ml-0">
+        <div className="flex gap-3">
           <button
-            onClick={() => router.push(`/dashboard/org/edit-event/${event.event_id ?? event.id}`)}
-            className="flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-xl transition-all shadow-lg shadow-rose-600/20 active:scale-95 font-semibold text-xs"
+            onClick={() =>
+              router.push(
+                `/dashboard/org/edit-event/${event.event_id ?? event.id}`
+              )
+            }
+            className="px-5 py-2 rounded-xl bg-(--sidebar-accent,#7c3aed) text-white"
           >
-            <Edit className="w-3.5 h-3.5" /> Edit Event
+            Edit
           </button>
           <button
-            onClick={() => router.push(`/dashboard/org/events/${event.event_id ?? event.id}/tickets`)}
-            className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-xl transition-all active:scale-95 font-semibold text-xs"
+            onClick={handleCopyLink}
+            className="px-4 py-2 rounded-xl bg-white/5 border border-slate-700 text-slate-100 hover:bg-slate-800 flex items-center gap-2"
           >
-            <Ticket className="w-3.5 h-3.5" /> Manage Tickets
+            <Copy className="h-4 w-4" />
+            Copy Link
+          </button>
+          <button
+            onClick={() => router.back()}
+            className="px-4 py-2 rounded-xl border border-slate-700 flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
           </button>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Cover Image */}
-          <div className="rounded-2xl overflow-hidden border border-white/5 bg-[#0A0A0A] shadow-xl">
-            <div className="h-64 sm:h-80 w-full relative">
-              <img
-                src={event.image || ""}
-                alt={event.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement.classList.add('bg-white/5', 'flex', 'items-center', 'justify-center');
-                  e.currentTarget.parentElement.innerHTML = '<div class="text-center"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#525252" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-image mx-auto mb-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg><span class="text-gray-500 text-xs uppercase font-bold">No Cover Image</span></div>';
-                }}
-              />
-            </div>
+      {/* Main layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* Left */}
+        <section className="lg:col-span-2 space-y-8">
+          <div className="h-96 rounded-2xl overflow-hidden bg-slate-800">
+            <img
+              src={getImageUrl(event.image)}
+              alt={event.name}
+              className="w-full h-full object-cover"
+              onError={(e) => (e.currentTarget.src = "")}
+            />
           </div>
 
           {/* Description */}
@@ -216,34 +234,34 @@ export default function EventDetailsPage() {
               </div>
             ))}
           </div>
-        </div>
+      </div>
 
-        {/* Sidebar Stats */}
-        <div className="space-y-6">
-          <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-6 shadow-xl sticky top-6">
-            <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-rose-500" /> Ticket Overview
-            </h3>
+      {/* Sidebar Stats */}
+      <div className="space-y-6">
+        <div className="bg-[#0A0A0A] border border-white/5 rounded-2xl p-6 shadow-xl sticky top-6">
+          <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-rose-500" /> Ticket Overview
+          </h3>
 
-            <div className="space-y-4">
-              {ticketStats.map((stat) => (
-                <div key={stat.label} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-gray-400 text-xs font-medium">{stat.label}</span>
-                  <span className={`font-bold ${stat.label === 'Revenue' ? 'text-emerald-400' : 'text-white'}`}>
-                    {stat.value}
-                  </span>
-                </div>
-              ))}
-            </div>
+          <div className="space-y-4">
+            {ticketStats.map((stat) => (
+              <div key={stat.label} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/5">
+                <span className="text-gray-400 text-xs font-medium">{stat.label}</span>
+                <span className={`font-bold ${stat.label === 'Revenue' ? 'text-emerald-400' : 'text-white'}`}>
+                  {stat.value}
+                </span>
+              </div>
+            ))}
+          </div>
 
-            <div className="mt-8 pt-6 border-t border-white/5">
-              <button className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
-                View Detailed Analytics <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
+          <div className="mt-8 pt-6 border-t border-white/5">
+            <button className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2">
+              View Detailed Analytics <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
     </div>
+    </div >
   );
 }
