@@ -12,6 +12,8 @@ const useOrganizerStore = create(
 
       setEvents: (events) => set({ events }),
 
+      setLastUpdate: () => set({ lastUpdate: Date.now() }),
+
       addEvent: (event) =>
         set((state) => ({
           events: [...state.events, event],
