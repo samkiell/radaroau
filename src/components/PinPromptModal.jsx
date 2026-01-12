@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import { verifyPinLocally, hasPinSet } from '@/lib/pinPrompt';
+import useAuthStore from '@/store/authStore';
 
 /**
  * PinPromptModal - Prompt for PIN to authorize sensitive actions
@@ -26,6 +27,8 @@ export default function PinPromptModal({
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const email = useAuthStore((s) => s.user?.email);
 
   const hasPin = hasPinSet();
 
@@ -62,7 +65,12 @@ export default function PinPromptModal({
   const handleForgotPin = async () => {
     setLoading(true);
     try {
-      await api.post('/forgot-pin/');
+      if (!email) {
+        toast.error('Unable to detect your email. Please re-login.');
+        return;
+      }
+
+      await api.post('/forgot-pin/', { Email: email });
       toast.success('PIN reset link sent to your email');
       handleClose();
     } catch (err) {

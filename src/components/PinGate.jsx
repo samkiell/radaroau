@@ -90,7 +90,22 @@ export default function PinGate({ children }) {
 
 		setSubmitting(true);
 		try {
-			await api.post("/pin/", { Email: email, pin });
+			try {
+				await api.post("/pin/", { Email: email, pin });
+			} catch (apiErr) {
+				const emailErr = apiErr?.response?.data?.Email?.[0];
+				const msg = apiErr?.response?.data?.Message || emailErr || apiErr?.message;
+				const alreadyExists =
+					typeof emailErr === "string" && emailErr.toLowerCase().includes("already exists");
+
+				// If the backend says a PIN already exists for this email,
+				// don't block the user: just proceed with local storage so the UI can continue.
+				if (!alreadyExists) {
+					throw apiErr;
+				}
+				toast.success("PIN already exists for this account");
+			}
+
 			await storePinLocally(pin);
 			setHasPin(true);
 			toast.success("PIN set successfully");

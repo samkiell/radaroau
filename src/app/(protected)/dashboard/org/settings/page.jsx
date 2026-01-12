@@ -176,7 +176,17 @@ export default function Settings() {
 
     setPinLoading(true);
     try {
-      await api.post('/pin/', { Email: email, pin: setPinValue });
+      try {
+        await api.post('/pin/', { Email: email, pin: setPinValue });
+      } catch (apiErr) {
+        const emailErr = apiErr?.response?.data?.Email?.[0];
+        const alreadyExists =
+          typeof emailErr === 'string' && emailErr.toLowerCase().includes('already exists');
+
+        if (!alreadyExists) throw apiErr;
+        toast.success('PIN already exists for this account');
+      }
+
       await storePinLocally(setPinValue);
       setHasPin(true);
       setSetPinValue('');
