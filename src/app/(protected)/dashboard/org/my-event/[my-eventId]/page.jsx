@@ -93,6 +93,7 @@ export default function EventDetailsPage() {
     return () => { isMountedRef.current = false; };
   }, [fetchEvent]);
 
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-black">
       <Loading />

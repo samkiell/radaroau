@@ -105,9 +105,18 @@ export default function CreateEvent() {
       setPreview(null);
       return;
     }
-    const url = URL.createObjectURL(imageFile);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
+    try {
+      const url = URL.createObjectURL(imageFile);
+      console.log("Image preview URL created:", url);
+      setPreview(url);
+      return () => {
+        URL.revokeObjectURL(url);
+        console.log("Image preview URL revoked");
+      };
+    } catch (err) {
+      console.error("Error creating image preview:", err);
+      toast.error("Failed to preview image");
+    }
   }, [imageFile]);
 
   const handleChange = (key) => (e) => {
@@ -118,8 +127,34 @@ export default function CreateEvent() {
   };
 
   const handleImage = (e) => {
-    const f = e.target.files?.[0] ?? null;
-    setImageFile(f);
+    const file = e.target.files?.[0];
+    console.log("File selected:", file);
+    
+    if (!file) {
+      console.log("No file selected");
+      setImageFile(null);
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error("Please select an image file");
+      console.error("Invalid file type:", file.type);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error("Image size must be less than 5MB");
+      console.error("File too large:", file.size);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    console.log("Valid image file:", file.name, file.type, file.size);
+    setImageFile(file);
   };
 
   const addCategory = () => {
@@ -507,7 +542,7 @@ export default function CreateEvent() {
             <div className="space-y-4 pt-2">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                  Cover Image
+                  Cover Image {imageFile && <span className="text-rose-500">• Selected: {imageFile.name}</span>}
                 </label>
                 <div className="relative group cursor-pointer border-2 border-dashed border-white/10 rounded-2xl hover:border-rose-500/50 hover:bg-rose-500/5 transition-all h-32 flex flex-col items-center justify-center text-center">
                   <input

@@ -5,9 +5,15 @@ import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, MapPin, Calendar, Clock, Ticket, Info, CheckCircle2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select-component";
+import { Loader2, MapPin, Calendar, Clock, Ticket, Info, CheckCircle2, Share2, Copy, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { getImageUrl } from "@/lib/utils";
@@ -24,7 +30,18 @@ const EventDetailsPage = () => {
   
   // Booking state
   const [quantity, setQuantity] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    const link = `${window.location.origin}/events/${eventId}`;
+    navigator.clipboard.writeText(link).then(() => {
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
 
   useEffect(() => {
     const fetchEventDetails = async () => {
@@ -33,6 +50,13 @@ const EventDetailsPage = () => {
       try {
         const response = await api.get(`/events/${eventId}/details/`);
         setEvent(response.data);
+        // Set default category if available
+        if (response.data.ticket_categories && response.data.ticket_categories.length > 0) {
+          const activeCategories = response.data.ticket_categories.filter(c => c.is_active && !c.is_sold_out);
+          if (activeCategories.length > 0) {
+            setSelectedCategory(activeCategories[0]);
+          }
+        }
       } catch (error) {
         console.error("Error fetching event details:", error);
         toast.error("Failed to load event details");
@@ -62,6 +86,7 @@ const EventDetailsPage = () => {
       const payload = {
         event_id: eventId,
         quantity: parseInt(quantity),
+        category_name: selectedCategory?.name,
         seat_number: selectedSeat
       };
 
@@ -175,16 +200,56 @@ const EventDetailsPage = () => {
               {/* Quantity Selector */}
               <div className="space-y-2">
                 <Label htmlFor="quantity" className="text-xs md:text-sm">Quantity</Label>
-                <Input 
-                  id="quantity"
-                  type="number" 
-                  min="1" 
-                  max="10"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                  className="h-9 md:h-10 text-sm md:text-base"
-                />
+                <Select 
+                  value={quantity.toString()} 
+                  onValueChange={(val) => setQuantity(parseInt(val))}
+                >
+                  <SelectTrigger id="quantity" className="h-9 md:h-10 text-sm md:text-base w-full">
+                    <SelectValue placeholder="Select quantity" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                      <SelectItem key={num} value={num.toString()}>
+                        {num} {num === 1 ? 'Ticket' : 'Tickets'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Category Selector */}
+              {event.ticket_categories && event.ticket_categories.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-xs md:text-sm">Ticket Category</Label>
+                  <Select 
+                    value={selectedCategory?.name || ""} 
+                    onValueChange={(val) => {
+                      const cat = event.ticket_categories.find(c => c.name === val);
+                      setSelectedCategory(cat);
+                    }}
+                  >
+                    <SelectTrigger id="category" className="h-9 md:h-10 text-sm md:text-base w-full">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {event.ticket_categories.map((cat) => (
+                        <SelectItem 
+                          key={cat.category_id} 
+                          value={cat.name}
+                          disabled={!cat.is_active || cat.is_sold_out}
+                        >
+                          {cat.name} - ₦{parseFloat(cat.price).toLocaleString()} {cat.is_sold_out ? "(Sold Out)" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedCategory?.description && (
+                    <p className="text-[10px] md:text-xs text-muted-foreground italic">
+                      {selectedCategory.description}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Seat Selection */}
               {event.allows_seat_selection && (
@@ -228,7 +293,7 @@ const EventDetailsPage = () => {
                   <span>
                     {event.pricing_type === 'free' 
                       ? 'Free' 
-                      : `₦${(event.price * quantity).toLocaleString()}`}
+                      : `₦${((selectedCategory ? parseFloat(selectedCategory.price) : event.price) * quantity).toLocaleString()}`}
                   </span>
                 </div>
               </div>
@@ -253,6 +318,29 @@ const EventDetailsPage = () => {
                 )}
               </Button>
             </CardFooter>
+          </Card>
+
+          {/* Share Section */}
+          <Card className="mt-6 md:mt-8 overflow-hidden">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Share2 className="h-4 w-4 text-primary" />
+                <h3 className="font-semibold text-sm md:text-base">Share this event</h3>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 bg-muted px-3 py-2 rounded-md text-xs md:text-sm text-muted-foreground truncate border border-border">
+                  {typeof window !== 'undefined' ? `${window.location.origin}/events/${eventId}` : ''}
+                </div>
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  onClick={handleCopyLink}
+                  className="shrink-0"
+                >
+                  {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+            </CardContent>
           </Card>
         </div>
       </div>

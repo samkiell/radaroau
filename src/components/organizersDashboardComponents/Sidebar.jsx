@@ -16,6 +16,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuthStore from "@/store/authStore";
+import useOrganizerStore from "@/store/orgStore";
 import { cn } from "@/lib/utils";
 
 const OrganizationDashboardNavLinks = [
@@ -43,9 +44,25 @@ export default function Sidebar() {
   const location = usePathname();
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
+  const clearOrgStore = useOrganizerStore((state) => state.clearStore);
 
   const handleLogout = () => {
+    // Clear stores
     logout();
+    clearOrgStore();
+    
+    // Selectively clear localStorage, preserving PIN data and welcome flags
+    if (typeof window !== 'undefined') {
+      const keysToPreserve = ['radar_pin_salt', 'radar_pin_hash', 'radar_has_pin'];
+      // Also preserve welcome flags for all users
+      const allKeys = Object.keys(localStorage);
+      const welcomeKeys = allKeys.filter(key => key.startsWith('radar_org_first_welcome:'));
+      const preserveKeys = [...keysToPreserve, ...welcomeKeys];
+      
+      const keysToRemove = allKeys.filter(key => !preserveKeys.includes(key));
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+    }
+    
     router.push("/login");
   };
 
@@ -102,8 +119,11 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 h-[calc(100vh-4rem)] bg-black border-r border-gray-900 text-white px-6 py-2 fixed left-0 top-16">
-        <nav className="flex-1 flex flex-col gap-4 mt-4">
+      <aside className="hidden md:flex flex-col w-64 h-screen bg-black border-r border-gray-900 text-white px-6 py-8 fixed left-0 top-0">
+        <div className="mb-8 flex items-center px-2">
+          <Logo className="text-white" textSize="text-2xl" />
+        </div>
+        <nav className="flex-1 flex flex-col gap-4">
           {OrganizationDashboardNavLinks.map((link) => (
             <Link
               key={link.name}
