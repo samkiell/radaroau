@@ -65,7 +65,20 @@ const LoginPage = () => {
         // But api docs say success response checks 'is_new_user', let's check what login() needs.
         // The store expects (user, access, refresh, role).
         // Let's use the role state we used to make the request, as Google signup implies that role.
-        login({ ...res.data }, access, refresh, role);
+        login({ user_id, email }, access, refresh, role);
+
+        // Show one-time "Welcome {name}" after first signup/verification.
+        try {
+          const isOrganizer = `${role}`.toLowerCase().trim() === "organizer";
+          if (isOrganizer && is_new_user && email) {
+            window.localStorage.setItem(
+              `radar_org_first_welcome:${email.toLowerCase()}`,
+              "true"
+            );
+          }
+        } catch {
+          // ignore
+        }
         toast.success("Login successful!");
         router.push("/dashboard");
       } catch (err) {

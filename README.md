@@ -2,7 +2,7 @@
 
 Radar is a comprehensive event ticketing platform designed to streamline event management and ticket purchasing. Built with modern web technologies, it provides a seamless experience for event organizers, students, and administrators.
 
-## 🚀 Tech Stack
+The PIN module provides functionality for managing Personal Identification Numbers (PINs) for organizers in the Radar system. It handles PIN creation, storage, and recovery operations with secure password hashing.
 
 - **Framework:** [Next.js 16](https://nextjs.org/) with App Router
 - **Language:** React 19.2
@@ -17,8 +17,125 @@ Radar is a comprehensive event ticketing platform designed to streamline event m
 - **Notifications:** [React Hot Toast](https://react-hot-toast.com/)
 - **Theme:** Dark/Light mode with [next-themes](https://github.com/pacocoursey/next-themes)
 
-## 📂 Project Structure
+**Features:**
+- Automatic password hashing on save using Django's `make_password`
+- Prevents double-hashing by checking if PIN is already hashed
+- String representation returns email and PIN
 
+**Example:**
+```python
+from radar.PIN.models import Pin
+
+# Create a new PIN
+pin = Pin.objects.create(
+    Email='organizer@example.com',
+    pin='1234'
+)
+# PIN is automatically hashed before saving
+```
+
+## API Endpoints
+
+### 1. Create/Set PIN
+
+**Endpoint:** `POST /pin/`
+
+**Description:** Creates or updates a PIN for an organizer. The organizer must exist in the system.
+
+**Request Body:**
+```json
+{
+    "Email": "organizer@example.com",
+    "pin": "1234"
+}
+```
+
+**Success Response (201 Created):**
+```json
+{
+    "Message": "PIN saved successfully!"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request`: If organizer does not exist or validation fails
+  ```json
+  {
+      "Message": "Organizer does not exist"
+  }
+  ```
+
+**Example:**
+```bash
+curl -X POST http://localhost:8000/pin/ \
+  -H "Content-Type: application/json" \
+  -d '{"Email": "organizer@example.com", "pin": "1234"}'
+```
+
+---
+
+### 2. Forgot PIN
+
+**Endpoint:** `POST /forgot-pin/`
+
+**Description:** Initiates the PIN recovery process by sending a PIN change link to the organizer's email.
+
+**Request Body:**
+```json
+{
+    "Email": "organizer@example.com"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+    "message": "PIN change link sent to email.",
+    "email": "organizer@example.com"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request`: If organizer does not exist
+  ```json
+  {
+      "Message": "Organizer does not exist"
+  }
+  ```
+- `500 Internal Server Error`: If email sending fails
+  ```json
+  {
+      "error": "Failed to send PIN change email. Please try again."
+  }
+  ```
+
+**Example:**
+```bash
+curl -X POST http://localhost:8000/forgot-pin/ \
+  -H "Content-Type: application/json" \
+  -d '{"Email": "organizer@example.com"}'
+```
+
+**Notes:**
+- Sends an email with a redirect link to the change-pin endpoint
+- Uses OTP generation (6-digit random number)
+- Logs email sending status for debugging
+
+---
+
+### 3. Change PIN
+
+**Endpoint:** `POST /change-pin/`
+
+**Description:** Changes an existing PIN for an organizer. Requires both new PIN and confirmation.
+
+**Request Body:**
+```json
+{
+    "Email": "organizer@example.com",
+    "Pin": "5678",
+    "ConfirmPin": "5678"
+}
 ```
 src/
 ├── app/                          # Next.js App Router
@@ -118,13 +235,14 @@ Routes are protected based on user roles:
 - Route prefetching
 - Optimized bundle with tree shaking
 
-## 👥 Contributors
+## URL Configuration
 
-- [Lupoetn](https://github.com/lupoetn)
-- [Abraham123-dev](https://github.com/abraham123-dev)
-- [samkiell](https://github.com/samkiell)
+The PIN URLs are configured in `urls.py`:
+- `/pin/` → `PinView`
+- `/forgot-pin/` → `ForgotPinView`
+- `/change-pin/` → `ChangePinView`
 
-## 📄 License
+Make sure these URLs are included in your main `urls.py` configuration.
 
 This project is proprietary and confidential. All rights reserved.
 
