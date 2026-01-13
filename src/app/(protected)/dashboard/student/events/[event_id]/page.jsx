@@ -189,24 +189,12 @@ const EventDetailsPage = () => {
                     <CardTitle className="text-lg md:text-xl">Book Tickets</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4 md:space-y-6 p-4 md:p-6 pt-0 md:pt-0">
-                    {/* Quantity Selector */}
+                    {/* Quantity Selector - RESTRICTED TO 1 */}
                     <div className="space-y-2">
-                      <Label htmlFor="quantity" className="text-xs md:text-sm">Quantity</Label>
-                      <Select 
-                        value={quantity.toString()} 
-                        onValueChange={(val) => setQuantity(parseInt(val))}
-                      >
-                        <SelectTrigger id="quantity" className="h-9 md:h-10 text-sm md:text-base w-full">
-                          <SelectValue placeholder="Select quantity" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
-                            <SelectItem key={num} value={num.toString()}>
-                              {num} {num === 1 ? 'Ticket' : 'Tickets'}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Label className="text-xs md:text-sm text-muted-foreground">Quantity</Label>
+                      <div className="h-9 md:h-10 w-full flex items-center px-3 border rounded-md bg-muted/50 text-muted-foreground text-sm md:text-base cursor-not-allowed">
+                        1 Ticket (Maximum per student)
+                      </div>
                     </div>
 
                     {/* Category Selector */}

@@ -299,21 +299,10 @@ const EventDetailsPage = () => {
                     )}
 
                     <div className="space-y-2">
-                      <Label htmlFor="quantity" className="text-xs md:text-sm">Quantity</Label>
-                      <Input
-                        id="quantity"
-                        type="number"
-                        min="1"
-                        max={selectedCategory?.max_quantity_per_booking || 10}
-                        value={quantity}
-                        onChange={(e) => {
-                          const val = Math.max(1, parseInt(e.target.value) || 1);
-                          const max = selectedCategory?.max_quantity_per_booking || 10;
-                          setQuantity(Math.min(val, max));
-                        }}
-                        className="h-9 md:h-10 text-sm md:text-base border-white/10 bg-white/5 text-white disabled:opacity-50"
-                        disabled={isSoldOut}
-                      />
+                      <Label className="text-xs md:text-sm text-muted-foreground">Quantity</Label>
+                      <div className="h-9 md:h-10 w-full flex items-center px-3 border border-white/10 rounded-md bg-white/5 text-gray-400 text-sm md:text-base cursor-not-allowed">
+                        1 Ticket (Maximum per person)
+                      </div>
                     </div>
 
                     {/* Price Summary */}
