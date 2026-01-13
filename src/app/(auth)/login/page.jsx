@@ -68,17 +68,7 @@ const LoginPage = () => {
         login({ user_id, email }, access, refresh, role);
 
         // Show one-time "Welcome {name}" after first signup/verification.
-        try {
-          const isOrganizer = `${role}`.toLowerCase().trim() === "organizer";
-          if (isOrganizer && is_new_user && email) {
-            window.localStorage.setItem(
-              `radar_org_first_welcome:${email.toLowerCase()}`,
-              "true"
-            );
-          }
-        } catch {
-          // ignore
-        }
+        // first-welcome logic removed
         toast.success("Login successful!");
         router.push("/dashboard");
       } catch (err) {
