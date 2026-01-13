@@ -20,6 +20,8 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [filterRole, setFilterRole] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     fetchUsers(filterRole);
@@ -99,6 +101,19 @@ export default function UsersPage() {
     { id: "organizer", label: "Organizers" },
   ];
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterRole]);
+
   return (
     <div className="space-y-4">
        <div>
@@ -158,14 +173,14 @@ export default function UsersPage() {
                       </div>
                     </td>
                   </tr>
-                ) : users.length === 0 ? (
+                ) : currentItems.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="p-6 text-center text-xs text-muted-foreground">
                       No users found.
                     </td>
                   </tr>
                 ) : (
-                  users.map((user) => (
+                  currentItems.map((user) => (
                     <tr key={user.id} className="hover:bg-muted/30 transition-colors text-xs">
                       <td className="p-3">
                          <div className="flex items-center gap-2.5 min-w-[140px]">
@@ -259,6 +274,31 @@ export default function UsersPage() {
              </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </Button>
+          <span className="text-sm text-gray-400">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ export default function TicketsPage() {
   const [loading, setLoading] = useState(true);
   const [tickets, setTickets] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     fetchTickets();
@@ -32,6 +34,19 @@ export default function TicketsPage() {
   };
 
   const statuses = ["all", "confirmed", "pending", "checked_in", "cancelled"];
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = tickets.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(tickets.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter]);
 
   return (
     <div className="space-y-4">
@@ -80,14 +95,14 @@ export default function TicketsPage() {
                         <Loader2 className="w-6 h-6 animate-spin text-primary mx-auto" />
                      </td>
                    </tr>
-                 ) : tickets.length === 0 ? (
+                 ) : currentItems.length === 0 ? (
                    <tr>
                      <td colSpan={6} className="p-8 text-center text-xs text-muted-foreground">
                        No tickets found.
                      </td>
                    </tr>
                  ) : (
-                   tickets.map((t) => (
+                   currentItems.map((t) => (
                      <tr key={t.ticket_id} className="hover:bg-muted/30 transition-colors text-xs">
                        <td className="p-3 font-mono text-muted-foreground">
                          <div className="flex items-center gap-2">
@@ -128,6 +143,31 @@ export default function TicketsPage() {
            </div>
          </CardContent>
        </Card>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </Button>
+          <span className="text-sm text-gray-400">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

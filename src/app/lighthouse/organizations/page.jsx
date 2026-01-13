@@ -6,10 +6,13 @@ import { Loader2, Mail, Phone, Building2 } from "lucide-react";
 import { adminService } from "../../../lib/admin";
 import { toast } from "react-hot-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Button } from "../../../components/ui/button";
 
 export default function OrganizationsPage() {
   const [loading, setLoading] = useState(true);
   const [organizers, setOrganizers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     fetchOrganizers();
@@ -26,6 +29,15 @@ export default function OrganizationsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = organizers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(organizers.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
 
   if (loading) {
@@ -64,14 +76,14 @@ export default function OrganizationsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {organizers.length === 0 ? (
+                {currentItems.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="p-6 text-center text-xs text-muted-foreground">
                       No organizations found.
                     </td>
                   </tr>
                 ) : (
-                  organizers.map((org) => (
+                  currentItems.map((org) => (
                     <tr key={org.id} className="hover:bg-muted/30 transition-colors text-xs">
                       <td className="p-3">
                         <div className="flex items-center gap-2.5">
@@ -117,6 +129,31 @@ export default function OrganizationsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </Button>
+          <span className="text-sm text-gray-400">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

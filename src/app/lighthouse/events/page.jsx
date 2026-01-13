@@ -13,6 +13,8 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     fetchEvents();
@@ -71,6 +73,19 @@ export default function EventsPage() {
     filter === "all" ? true : event.status === filter
   );
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredEvents.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -119,14 +134,14 @@ export default function EventsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {filteredEvents.length === 0 ? (
+                {currentItems.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="p-6 text-center text-xs text-muted-foreground">
                       No events found matching this filter.
                     </td>
                   </tr>
                 ) : (
-                  filteredEvents.map((event) => (
+                  currentItems.map((event) => (
                     <tr key={event.event_id} className="hover:bg-muted/30 transition-colors text-xs">
                       <td className="p-3">
                         <div className="flex items-center gap-2">
@@ -241,6 +256,31 @@ export default function EventsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-end gap-2 mt-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </Button>
+          <span className="text-sm text-gray-400">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
