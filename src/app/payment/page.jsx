@@ -87,12 +87,19 @@ function PaymentCallbackContent() {
       } catch (error) {
         console.error("Payment verification error:", error);
         
-        setStatus("failed");
-        setMessage(
-          error.response?.data?.error || 
-          error.response?.data?.message || 
-          "Failed to verify payment. Please contact support with your payment reference."
-        );
+        const errorMessage = error.response?.data?.error || error.response?.data?.message || "";
+        
+        // Handle specific case where payment was verified but tickets already processed (webhook already handled it)
+        if (errorMessage.includes("no pending tickets") || errorMessage.includes("already confirmed")) {
+          setStatus("success");
+          setMessage("Payment successful! Your tickets have been confirmed. Check your email or dashboard for details.");
+        } else {
+          setStatus("failed");
+          setMessage(
+            errorMessage || 
+            "Failed to verify payment. Please contact support with your payment reference."
+          );
+        }
       }
     };
 
