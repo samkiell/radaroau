@@ -1,3 +1,23 @@
+/**
+ * Payment Callback Page
+ * 
+ * Handles Paystack payment redirects after checkout
+ * 
+ * Expected URL patterns:
+ * - Success: /payment?reference=xxx&status=success
+ * - Failed: /payment?status=failed
+ * - Cancelled: /payment?status=cancelled
+ * 
+ * Backend callback URL should be configured as:
+ * https://radar.samkiel.dev/payment?status=success
+ * 
+ * The page will:
+ * 1. Extract payment reference from URL query params
+ * 2. Verify payment with backend API (POST /tickets/verify-payment/)
+ * 3. Display success/failure message with ticket details
+ * 4. Redirect user to appropriate page (my tickets or events)
+ */
+
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
@@ -39,16 +59,27 @@ function PaymentCallbackContent() {
         return;
       }
 
-      // Verify payment with backend
+      // Verify payment with backend using POST request
       try {
-        const response = await api.get(`/tickets/verify-payment/?reference=${reference}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {}
+        const response = await api.post(`/tickets/verify-payment/`, {
+          reference: reference
         });
 
-        if (response.data.status === "success" || response.data.verified) {
+        // Check if verification was successful
+        if (response.data.message && response.data.message.includes("verified successfully")) {
           setStatus("success");
-          setMessage(response.data.message || "Payment successful! Your ticket has been booked.");
-          setTicketData(response.data.ticket || response.data);
+          setMessage(response.data.message);
+          
+          // Extract ticket data
+          const tickets = response.data.tickets || [];
+          if (tickets.length > 0) {
+            setTicketData({
+              event_name: tickets[0].event_name,
+              quantity: tickets.length,
+              amount: tickets.reduce((sum, ticket) => sum + parseFloat(ticket.total_price || 0), 0),
+              tickets: tickets
+            });
+          }
         } else {
           setStatus("failed");
           setMessage(response.data.message || "Payment verification failed. Please contact support.");
@@ -56,33 +87,10 @@ function PaymentCallbackContent() {
       } catch (error) {
         console.error("Payment verification error:", error);
         
-        // Check if it's an authentication error
-        if (error.response?.status === 401 || error.response?.data?.detail?.includes("Authentication")) {
-          // Try to verify without token for webhook-verified payments
-          try {
-            const publicResponse = await api.get(`/tickets/verify-payment/?reference=${reference}`);
-            
-            if (publicResponse.data.status === "success" || publicResponse.data.verified) {
-              setStatus("success");
-              setMessage(publicResponse.data.message || "Payment successful! Your ticket has been booked.");
-              setTicketData(publicResponse.data.ticket || publicResponse.data);
-              
-              // Prompt user to login to view their ticket
-              toast.success("Payment verified! Please login to view your ticket.");
-              setTimeout(() => {
-                router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard/student/my-tickets")}`);
-              }, 3000);
-              return;
-            }
-          } catch (publicError) {
-            console.error("Public verification also failed:", publicError);
-          }
-        }
-        
         setStatus("failed");
         setMessage(
-          error.response?.data?.message || 
           error.response?.data?.error || 
+          error.response?.data?.message || 
           "Failed to verify payment. Please contact support with your payment reference."
         );
       }
@@ -160,14 +168,14 @@ function PaymentCallbackContent() {
                 )}
                 {ticketData.quantity && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Quantity:</span>
-                    <span className="text-foreground font-medium">{ticketData.quantity}</span>
+                    <span className="text-muted-foreground">Tickets:</span>
+                    <span className="text-foreground font-medium">{ticketData.quantity} ticket{ticketData.quantity > 1 ? 's' : ''}</span>
                   </div>
                 )}
-                {ticketData.amount && (
+                {ticketData.amount !== undefined && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Amount Paid:</span>
-                    <span className="text-foreground font-medium">₦{parseFloat(ticketData.amount).toLocaleString()}</span>
+                    <span className="text-foreground font-medium">₦{Number(ticketData.amount).toLocaleString()}</span>
                   </div>
                 )}
               </div>
