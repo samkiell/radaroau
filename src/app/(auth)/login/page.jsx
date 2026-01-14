@@ -123,16 +123,14 @@ const LoginContent = () => {
       login({ ...response.data }, access, refresh, userRole)
       toast.success('Login successful! Redirecting...', { id: toastId })
       
-      // Small delay to ensure auth state is updated
-      setTimeout(() => {
-        if (callbackUrl) {
-          const decodedUrl = decodeURIComponent(callbackUrl);
-          console.log('Redirecting to callback URL:', decodedUrl);
-          router.push(decodedUrl);
-        } else {
-          router.push('/dashboard');
-        }
-      }, 100);
+      // Use router.replace to avoid adding to history and ensure clean redirect
+      if (callbackUrl) {
+        const decodedUrl = decodeURIComponent(callbackUrl);
+        console.log('Redirecting to callback URL:', decodedUrl);
+        router.replace(decodedUrl);
+      } else {
+        router.replace('/dashboard');
+      }
     } catch (err) {
       console.error("Login error:", err);
       const message = err.response?.data?.error || "Invalid email or password";
