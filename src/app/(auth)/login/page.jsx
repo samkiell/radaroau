@@ -97,27 +97,35 @@ const LoginContent = () => {
       const response = await api.post('/login/', formData)
       const { user_id, email, access, refresh, role: responseRole } = response.data
       
+      // Determine if user is coming from an event booking flow
+      const isEventBookingFlow = callbackUrl && decodeURIComponent(callbackUrl).includes('/events/');
+      
       let userRole = responseRole;
-      if (!userRole && access) {
-        const decoded = parseJwt(access);
-        // Check for common role claims
-        userRole = decoded?.role || decoded?.user_type;
-        
-        // If still not found, check specific boolean flags if they exist
-        if (!userRole && decoded?.is_organizer) {
-            userRole = 'organizer';
-        }
-      }
-
-      // Fallback: Check email domain if role is still not determined
-      if (!userRole) {
-          if (email.endsWith('@student.oauife.edu.ng')) {
-              userRole = 'student';
-          } else {
-              // Default to organizer if not a student email 
-              // (since organizers can have generic emails like Gmail, Yahoo, etc.)
+      
+      // If coming from event booking and user selected "Student", prioritize that choice
+      // This handles the case where a user has an organizer account but wants to book as a student
+      if (isEventBookingFlow && role === "Student") {
+        userRole = "student";
+        console.log('Event booking flow detected - using student role from UI selection');
+      } else {
+        // Standard role detection flow
+        if (!userRole && access) {
+          const decoded = parseJwt(access);
+          // Check for common role claims
+          userRole = decoded?.role || decoded?.user_type;
+          
+          // If still not found, check specific boolean flags if they exist
+          if (!userRole && decoded?.is_organizer) {
               userRole = 'organizer';
           }
+        }
+
+        // Fallback: Use the role selected by the user in the login form UI
+        // This is the most reliable fallback since users explicitly choose their role
+        if (!userRole) {
+            // Use the role toggle selection (Student/Organizer) - convert to lowercase
+            userRole = role.toLowerCase();
+        }
       }
 
       login({ ...response.data }, access, refresh, userRole)

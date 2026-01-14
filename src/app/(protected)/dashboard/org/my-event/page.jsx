@@ -358,19 +358,19 @@ const MyEvent = () => {
                     <button
                       onClick={(e) => ev.status === 'verified' ? handleCopyLink(e, id) : e.stopPropagation()}
                       disabled={ev.status !== 'verified'}
-                      className={`flex items-center gap-1.5 px-3 py-2.5 border rounded-xl transition-all ${
+                      className={`flex items-center gap-2 px-4 py-2.5 border rounded-xl transition-all font-medium ${
                         ev.status === 'verified'
-                          ? 'bg-white/5 hover:bg-rose-500/10 border-white/5 group/copy cursor-pointer'
-                          : 'bg-white/[0.02] border-white/5 cursor-not-allowed opacity-50'
+                          ? 'bg-rose-500/5 hover:bg-rose-500/15 border-rose-500/30 hover:border-rose-500/50 group/copy cursor-pointer'
+                          : 'bg-gray-900/30 border-gray-700 cursor-not-allowed opacity-50'
                       }`}
                       title={ev.status === 'verified' ? 'Copy Event Link' : 'Event must be verified to share'}
                     >
-                      <Copy className={`w-3.5 h-3.5 transition-colors ${
-                        ev.status === 'verified' ? 'text-gray-500 group-hover/copy:text-rose-500' : 'text-gray-600'
+                      <Copy className={`w-4 h-4 transition-colors ${
+                        ev.status === 'verified' ? 'text-rose-500 group-hover/copy:text-rose-400' : 'text-gray-600'
                       }`} />
-                      <span className={`text-[10px] font-bold transition-colors uppercase tracking-wider ${
-                        ev.status === 'verified' ? 'text-gray-500 group-hover/copy:text-rose-500' : 'text-gray-600'
-                      }`}>Copy</span>
+                      <span className={`text-xs transition-colors font-bold uppercase tracking-wider ${
+                        ev.status === 'verified' ? 'text-rose-500 group-hover/copy:text-rose-400' : 'text-gray-600'
+                      }`}>Copy Link</span>
                     </button>
                   </div>
                 </div>

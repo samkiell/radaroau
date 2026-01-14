@@ -368,7 +368,6 @@ const EventDetailsPage = () => {
                         <span>Total</span>
                         <span className="text-rose-500">
                           {event.pricing_type === 'free'
-                          {event.pricing_type === 'free'
                             ? 'Free'
                             : `₦${(parseFloat(String(selectedCategory?.price ?? displayEventPrice)) * quantity).toLocaleString()}`}
                         </span>
