@@ -154,14 +154,24 @@ const MyTicketsPage = () => {
 
                   {/* Small QR Code Preview - Show actual QR code */}
                   {ticket.status === "confirmed" && ticket.ticket_id && (
-                    <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg mt-2">
+                    <div className="flex flex-col items-center justify-center p-3 bg-white rounded-lg mt-2 hover:bg-gray-50 transition-colors relative group">
                       <QRCodeSVG
                         value={ticket.ticket_id}
                         size={80}
                         level={"H"}
                         marginSize={0}
                       />
-                      <span className="text-[10px] text-black mt-1">Click to expand</span>
+                      <div className="flex items-center gap-1 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-black opacity-60">
+                          <circle cx="11" cy="11" r="8"/>
+                          <path d="m21 21-4.35-4.35"/>
+                          <line x1="11" y1="8" x2="11" y2="14"/>
+                          <line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                        <span className="text-[10px] text-black opacity-80">Click to expand</span>
+                      </div>
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 rounded-lg transition-colors pointer-events-none" />
                     </div>
                   )}
                 </CardContent>
