@@ -121,14 +121,18 @@ const LoginContent = () => {
       }
 
       login({ ...response.data }, access, refresh, userRole)
-      login({ ...response.data }, access, refresh, userRole)
       toast.success('Login successful! Redirecting...', { id: toastId })
       
-      if (callbackUrl) {
-        router.push(decodeURIComponent(callbackUrl));
-      } else {
-        router.push('/dashboard');
-      }
+      // Small delay to ensure auth state is updated
+      setTimeout(() => {
+        if (callbackUrl) {
+          const decodedUrl = decodeURIComponent(callbackUrl);
+          console.log('Redirecting to callback URL:', decodedUrl);
+          router.push(decodedUrl);
+        } else {
+          router.push('/dashboard');
+        }
+      }, 100);
     } catch (err) {
       console.error("Login error:", err);
       const message = err.response?.data?.error || "Invalid email or password";
