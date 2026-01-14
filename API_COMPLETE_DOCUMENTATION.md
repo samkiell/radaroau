@@ -4645,7 +4645,10 @@ await toggleUserStatus('organiser:ABC12-XYZ34', 'organizer', false);
 await toggleUserStatus('organiser:ABC12-XYZ34', 'organizer', true);
 ```
 
----
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `role` | string | Yes | User role: `student` or `organizer` |
 
 ### 10. Verify/Unverify Organizer
 
@@ -4716,7 +4719,7 @@ async function toggleOrganizerVerification(organiserId, isVerified) {
 await toggleOrganizerVerification('organiser:ABC12-XYZ34', true);
 ```
 
----
+**Description:** Mark an organizer as verified (trusted) or unverified. Verified organizers display a verification badge.
 
 ### 11. Delete User
 
@@ -5847,7 +5850,10 @@ const organizers = await getUsers({ role: 'organizer' });
 
 ---
 
----
+#### 5. **Serializer Architecture**
+- Serializers only validate data format
+- No business logic in serializers
+- Clean separation of concerns
 
 ## Architecture Notes ✨ NEW
 
