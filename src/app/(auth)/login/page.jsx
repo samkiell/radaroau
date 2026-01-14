@@ -121,13 +121,15 @@ const LoginContent = () => {
       }
 
       login({ ...response.data }, access, refresh, userRole)
-      login({ ...response.data }, access, refresh, userRole)
       toast.success('Login successful! Redirecting...', { id: toastId })
       
+      // Use router.replace to avoid adding to history and ensure clean redirect
       if (callbackUrl) {
-        router.push(decodeURIComponent(callbackUrl));
+        const decodedUrl = decodeURIComponent(callbackUrl);
+        console.log('Redirecting to callback URL:', decodedUrl);
+        router.replace(decodedUrl);
       } else {
-        router.push('/dashboard');
+        router.replace('/dashboard');
       }
     } catch (err) {
       console.error("Login error:", err);

@@ -93,7 +93,8 @@ const EventDetailsPage = () => {
   const handleBookTicket = async () => {
     if (!token) {
       toast.error("Please login to book tickets");
-      const callbackUrl = encodeURIComponent(`/events/${eventId}`);
+      const currentPath = window.location.pathname;
+      const callbackUrl = encodeURIComponent(currentPath);
       setTimeout(() => {
         router.push(`/login?callbackUrl=${callbackUrl}`);
       }, 1500);
@@ -314,7 +315,7 @@ const EventDetailsPage = () => {
                                 <span className={`text-sm font-bold ${selectedCategory?.category_id === cat.category_id ? "text-rose-500" : "text-white"}`}>
                                   {cat.name}
                                 </span>
-                                <span className="text-xs font-bold text-white">₦{cat.price}</span>
+                                <span className="text-xs font-bold text-white">₦{(parseFloat(cat.price) || 0).toLocaleString()}</span>
                               </div>
                               {cat.description && <p className="text-[10px] text-gray-500 line-clamp-1">{cat.description}</p>}
                               {cat.is_sold_out && <span className="text-[10px] text-rose-500 font-bold uppercase mt-1">Sold Out</span>}
@@ -324,13 +325,32 @@ const EventDetailsPage = () => {
                       </div>
                     )}
 
+                    {categories.length === 0 && event.pricing_type === 'paid' && (
+                      <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm text-center">
+                        No ticket categories available yet. Please check back later.
+                      </div>
+                    )}
+
                     <div className="space-y-2">
                       <Label className="text-xs md:text-sm text-muted-foreground">Quantity</Label>
-                      <div className="h-9 md:h-10 w-full flex items-center px-3 border border-gray-600 rounded-md bg-gray-600/5 text-gray-400 text-sm md:text-base cursor-not-allowed">
-                        1 Ticket (Maximum per transaction)
-                      </div>
-                      <p className="text-[10px] md:text-xs text-muted-foreground/80 italic">
-                        💡 Need more tickets? You can make another booking after this one.
+                      <Select
+                        value={quantity.toString()}
+                        onValueChange={(val) => setQuantity(parseInt(val))}
+                        disabled={bookingLoading}
+                      >
+                        <SelectTrigger className="h-10 border-gray-600 bg-gray-600/5">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: event?.max_quantity_per_booking || 3 }, (_, i) => i + 1).map((num) => (
+                            <SelectItem key={num} value={num.toString()}>
+                              {num} {num === 1 ? 'Ticket' : 'Tickets'}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[10px] md:text-xs text-muted-foreground/80">
+                        Maximum {event?.max_quantity_per_booking || 3} tickets per booking. Each ticket gets a unique QR code.
                       </p>
                     </div>
 
@@ -347,6 +367,7 @@ const EventDetailsPage = () => {
                       <div className="flex justify-between font-bold text-base md:text-lg">
                         <span>Total</span>
                         <span className="text-rose-500">
+                          {event.pricing_type === 'free'
                           {event.pricing_type === 'free'
                             ? 'Free'
                             : `₦${(parseFloat(String(selectedCategory?.price ?? displayEventPrice)) * quantity).toLocaleString()}`}
