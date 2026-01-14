@@ -350,8 +350,8 @@ const EventDetailsPage = () => {
                         <span>Price per ticket</span>
                         <span className="text-white">
                           {selectedCategory
-                            ? `₦${selectedCategory.price}`
-                            : (event.pricing_type === 'free' ? 'Free' : `₦${event.price}`)}
+                            ? `₦${parseFloat(selectedCategory.price).toLocaleString()}`
+                            : (event.pricing_type === 'free' ? 'Free' : `₦${parseFloat(event.price).toLocaleString()}`)}
                         </span>
                       </div>
                       <div className="flex justify-between font-bold text-base md:text-lg">

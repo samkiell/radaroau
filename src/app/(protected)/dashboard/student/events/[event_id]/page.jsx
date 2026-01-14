@@ -283,14 +283,14 @@ const EventDetailsPage = () => {
                     <div className="pt-4 border-t space-y-2">
                       <div className="flex justify-between text-xs md:text-sm">
                         <span>Price per ticket</span>
-                        <span>{event.pricing_type === 'free' ? 'Free' : `₦${event.price}`}</span>
+                        <span>{event.pricing_type === 'free' ? 'Free' : `₦${parseFloat(event.price).toLocaleString()}`}</span>
                       </div>
                       <div className="flex justify-between font-bold text-base md:text-lg">
                         <span>Total</span>
                         <span>
                           {event.pricing_type === 'free' 
                             ? 'Free' 
-                            : `₦${((selectedCategory ? parseFloat(selectedCategory.price) : event.price) * quantity).toLocaleString()}`}
+                            : `₦${((selectedCategory ? parseFloat(selectedCategory.price) : parseFloat(event.price)) * quantity).toLocaleString()}`}
                         </span>
                       </div>
                     </div>
