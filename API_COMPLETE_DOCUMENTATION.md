@@ -85,7 +85,7 @@ Authorization: Bearer <access_token>
 Tokens are received after:
 - Login (`POST /login/`)
 - Registration (after OTP verification: `POST /verify-otp/`)
-- Google Sign Up
+- Google Sign Up (`POST /student/google-signup/` or `POST /organizer/google-signup/`)
 
 ### Token Structure
 
@@ -135,7 +135,7 @@ headers: {
 }
 ```
 
-**Note:** Email must be from the `@student.oauife.edu.ng` domain.
+**Note:** Any valid email address is accepted (email domain restriction removed).
 
 **Field Requirements:**
 - `Firstname`: Required, string, max 100 characters
@@ -154,7 +154,7 @@ headers: {
 **Error Response (400 Bad Request):**
 ```json
 {
-  "Email": ["Email must be from the domain student.oauife.edu.ng"],
+  "Email": ["Enter a valid email address."],
   "Firstname": ["This field is required."]
 }
 ```
@@ -1174,7 +1174,80 @@ async function verifyPin(enteredPin) {
 
 ---
 
-### 16. Google Sign Up (Organizer)
+### 16. Google Sign Up (Student)
+
+**Endpoint:** `POST /student/google-signup/`
+
+**Description:** Register/login student using Google OAuth. Accepts Google **access token** and fetches user info from Google UserInfo API.
+
+**Authentication:** Not required
+
+**Request Body:**
+```json
+{
+  "token": "ya29.A0ARrdaM..."
+}
+```
+
+Or alternatively:
+```json
+{
+  "access_token": "ya29.A0ARrdaM..."
+}
+```
+
+**Note:** The token should be the Google **access token** (starts with `ya29.`), NOT the ID token.
+
+**Success Response (200 OK):**
+```json
+{
+  "message": "Google login successful",
+  "email": "student@example.com",
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "is_new_user": true
+}
+```
+
+**Response Fields:**
+| Field | Type | Description |
+|-------|------|-------------|
+| `message` | string | Success message |
+| `email` | string | User's email from Google |
+| `access` | string | JWT access token for API calls |
+| `refresh` | string | JWT refresh token |
+| `is_new_user` | boolean | `true` if user needs to complete profile (missing name or profile incomplete) |
+
+**Frontend Implementation:**
+```typescript
+import { useGoogleLogin } from '@react-oauth/google'
+
+const googleLogin = useGoogleLogin({
+  onSuccess: async (tokenResponse) => {
+    const response = await fetch('/student/google-signup/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: tokenResponse.access_token })
+    })
+    const data = await response.json()
+    
+    // Store tokens
+    localStorage.setItem('access_token', data.access)
+    localStorage.setItem('refresh_token', data.refresh)
+    
+    // Redirect based on is_new_user
+    if (data.is_new_user) {
+      router.push('/complete-profile')
+    } else {
+      router.push('/dashboard')
+    }
+  }
+})
+```
+
+---
+
+### 17. Google Sign Up (Organizer)
 
 **Endpoint:** `POST /organizer/google-signup/`
 
@@ -1325,7 +1398,7 @@ const eventTypes = config.event_types; // Array of {value, label}
     "event_name": "Tech Conference 2024",
     "event_location": "OAU Campus",
     "event_date": "2024-12-15T10:00:00Z",
-    "event_price": 5000.00,
+    "event_price": 5000.00,  // Minimum price from ticket categories (for display purposes)
     "event_image": "https://res.cloudinary.com/your_cloud_name/image/upload/v1234567890/radar/events/tech.jpg",
     "event_type": "tech",
     "pricing_type": "paid"
@@ -1335,7 +1408,7 @@ const eventTypes = config.event_types; // Array of {value, label}
     "event_name": "Cultural Day",
     "event_location": "OAU Amphitheatre",
     "event_date": "2024-12-20T14:00:00Z",
-    "event_price": 0.00,
+    "event_price": 0.00,  // Minimum price from ticket categories (for display purposes)
     "event_image": null,
     "event_type": "cultural",
     "pricing_type": "free"
@@ -1501,8 +1574,6 @@ When using FormData, append each field with the correct type:
 | `event_type` | string | Yes | `"tech"` | See event types below |
 | `location` | string | Yes | `"OAU Campus"` | Max 200 characters |
 | `date` | string | Yes | `"2024-12-15T10:00:00Z"` | ISO 8601 datetime format |
-| `capacity` | integer/string | No | `100` or `"100"` | Can be null/empty |
-| `price` | number/string | Yes | `5000.00` or `"5000.00"` | Decimal, 0.00 for free events |
 | `max_quantity_per_booking` | integer/string | No | `5` or `"5"` | Maximum tickets per booking. Defaults to 3 if not set |
 | `image` | File | No | File object | Must be actual File, not dict/object |
 
@@ -1521,9 +1592,8 @@ formData.append('pricing_type', 'paid');
 formData.append('event_type', 'tech');
 formData.append('location', 'OAU Campus');
 formData.append('date', '2024-12-15T10:00:00Z'); // ISO 8601 format
-formData.append('capacity', '100'); // Can be number or string
-formData.append('price', '5000.00'); // Must be number or numeric string
 formData.append('max_quantity_per_booking', '5'); // Optional, defaults to 3 if not set
+// Note: Price and capacity are now set at the ticket category level, not event level
 
 // Add image file (if provided)
 if (imageFile) {
@@ -1550,8 +1620,7 @@ formData.append('pricing_type', 'free');
 formData.append('event_type', 'workshop');
 formData.append('location', 'Online');
 formData.append('date', '2024-12-20T14:00:00Z');
-formData.append('capacity', '50');
-formData.append('price', '0.00'); // Must be 0.00 for free events
+// Note: Price and capacity are now set at the ticket category level, not event level
 // image field omitted or set to null
 
 const response = await fetch('http://localhost:8000/event/', {
@@ -1572,9 +1641,16 @@ const response = await fetch('http://localhost:8000/event/', {
   "event_type": "tech",
   "location": "OAU Campus",
   "date": "2024-12-15T10:00:00Z",
-  "capacity": 100,
-  "price": "5000.00",
   "max_quantity_per_booking": 3,
+  "ticket_categories": [
+    {
+      "category_id": "category:ABC-12345",
+      "name": "General",
+  "price": "5000.00",
+      "max_tickets": 100,
+      "is_active": true
+    }
+  ],
   "image": "https://res.cloudinary.com/your_cloud_name/image/upload/v1234567890/radar/events/tech.jpg"
 }
 ```
@@ -1622,9 +1698,8 @@ const response = await fetch('http://localhost:8000/event/', {
  * @param {string} eventData.event_type - Event type (see list above)
  * @param {string} eventData.location - Event location
  * @param {Date|string} eventData.date - Event date (Date object or ISO string)
- * @param {number} eventData.capacity - Event capacity (optional)
- * @param {number} eventData.price - Event price (required, 0.00 for free)
  * @param {number} eventData.max_quantity_per_booking - Maximum tickets per booking (optional, defaults to 3)
+ * @note Price and capacity are now set at the ticket category level, not event level
  * @param {File|null} eventData.image - Image file (optional)
  * @returns {Promise<Object>} Created event data
  */
@@ -1652,19 +1727,12 @@ async function createEvent(eventData) {
   formData.append('date', dateValue);
   
   // Add optional fields
-  if (eventData.capacity !== undefined && eventData.capacity !== null) {
-    formData.append('capacity', String(eventData.capacity));
-  }
-  
   if (eventData.max_quantity_per_booking !== undefined && eventData.max_quantity_per_booking !== null) {
     formData.append('max_quantity_per_booking', String(eventData.max_quantity_per_booking));
   }
   
-  // Price must be a number or numeric string, NOT an object
-  const priceValue = typeof eventData.price === 'number' 
-    ? eventData.price.toString() 
-    : String(eventData.price);
-  formData.append('price', priceValue);
+  // Note: Price and capacity are now set at the ticket category level, not event level
+  // After creating the event, you must create ticket categories with prices and capacities
   
   // Add image file if provided (must be File object, not dict/object)
   if (eventData.image && eventData.image instanceof File) {
@@ -1900,7 +1968,7 @@ All ticket responses include the following fields:
 
 **Field Requirements:**
 - `event_id`: Required, valid event ID
-- `category_name`: Optional, ticket category name (e.g., "Early Bird", "VIP", "Group of 4"). If not provided, uses event default price.
+- `category_name`: **Required**, ticket category name (e.g., "Early Bird", "VIP", "Group of 4"). Events must have ticket categories - there is no default price.
 - `quantity`: Required, integer, min 1. Number of individual tickets to create (each person gets their own ticket).
 
 **Note:** To see available ticket categories for an event, use `GET /tickets/categories/?event_id=<event_id>` or check the `ticket_categories` field in event details.
@@ -2047,6 +2115,153 @@ All ticket responses include the following fields:
 
 **Note:** The maximum tickets per booking is set at the event level (via `max_quantity_per_booking` field). If not set when creating the event, it defaults to 3 tickets per booking.
 
+---
+
+### 2. Organizer Book Ticket for Attendee
+
+**Endpoint:** `POST /tickets/organizer/book-for-attendee/`
+
+**Description:** Allow organizer to buy tickets on behalf of an attendee. This creates a minimal attendee record (not a full registration) and books tickets. Tickets are sent to the attendee's email address.
+
+**Important:**
+- This is **NOT** a full user registration - just a minimal record to link tickets
+- The attendee does not need to have an account on the platform
+- Tickets are automatically sent to the attendee's email
+- For paid events, payment goes through the same Paystack flow
+- Organizer can only book tickets for their own events
+
+**Authentication:** Required (JWT token, Organizer only)
+
+**Request Body:**
+```json
+{
+  "firstname": "John",
+  "lastname": "Doe",
+  "email": "john.doe@gmail.com",
+  "event_id": "event:TE-12345",
+  "category_name": "Early Bird",
+  "quantity": 2
+}
+```
+
+**Field Requirements:**
+- `firstname`: Required, attendee's first name
+- `lastname`: Required, attendee's last name
+- `email`: Required, attendee's email address (ticket will be sent here)
+- `event_id`: Required, event ID (must belong to authenticated organizer)
+- `category_name`: Required, ticket category name (e.g., "Early Bird", "VIP")
+- `quantity`: Required, integer, min 1. Number of tickets to book
+
+**Success Response - Free Event (201 Created):**
+```json
+{
+  "message": "2 ticket(s) purchased successfully for John Doe",
+  "attendee_email": "john.doe@gmail.com",
+  "attendee_name": "John Doe",
+  "tickets": [
+    {
+      "ticket_id": "ticket:TC-12345",
+      "event_id": "event:TE-12345",
+      "event_name": "Tech Conference 2024",
+      "student_email": "john.doe@gmail.com",
+      "student_full_name": "John Doe",
+      "status": "confirmed",
+      "quantity": 1,
+      "total_price": "0.00",
+      "category_name": "Early Bird",
+      "qr_code": "QR-ticket:TC-12345"
+    }
+  ],
+  "booking_id": "booking:ABC-12345",
+  "ticket_count": 2
+}
+```
+
+**Success Response - Paid Event (200 OK):**
+```json
+{
+  "message": "Payment initialized for John Doe",
+  "attendee_email": "john.doe@gmail.com",
+  "attendee_name": "John Doe",
+  "tickets": [
+    {
+      "ticket_id": "ticket:TC-12345",
+      "event_id": "event:TE-12345",
+      "event_name": "Tech Conference 2024",
+      "student_email": "john.doe@gmail.com",
+      "student_full_name": "John Doe",
+      "status": "pending",
+      "quantity": 1,
+      "total_price": "5000.00",
+      "category_name": "Early Bird",
+      "qr_code": "QR-ticket:TC-12345"
+    }
+  ],
+  "booking_id": "booking:ABC-12345",
+  "ticket_count": 2,
+  "payment_url": "https://paystack.com/pay/xxxxx",
+  "payment_reference": "bookingABC-12345"
+}
+```
+
+**Error Response (403 Forbidden - Not Your Event):**
+```json
+{
+  "error": "You can only book tickets for your own events"
+}
+```
+
+**Error Response (400 Bad Request - Missing Category):**
+```json
+{
+  "error": "category_name is required. Events must have ticket categories."
+}
+```
+
+**Frontend Implementation:**
+```javascript
+async function organizerBookForAttendee(attendeeData, eventId, categoryName, quantity) {
+  const token = localStorage.getItem('access_token');
+  
+  const response = await fetch('http://localhost:8000/tickets/organizer/book-for-attendee/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      firstname: attendeeData.firstname,
+      lastname: attendeeData.lastname,
+      email: attendeeData.email,
+      event_id: eventId,
+      category_name: categoryName,
+      quantity: quantity
+    }),
+  });
+  
+  const result = await response.json();
+  
+  if (result.payment_url) {
+    // Paid event - redirect to payment
+    window.location.href = result.payment_url;
+  } else {
+    // Free event - tickets created successfully
+    console.log(`Tickets sent to ${result.attendee_email}`);
+  }
+  
+  return result;
+}
+```
+
+**Note:**
+- The attendee does NOT need to be registered on the platform
+- A minimal record is created just to link the tickets
+- Tickets are automatically emailed to the attendee
+- For paid events, the payment flow is the same as normal booking
+- The attendee can register later if they want to access their tickets
+
+---
+
 **Frontend Implementation:**
 ```javascript
 async function bookTicket(eventId, quantity, categoryName = null) {
@@ -2060,7 +2275,7 @@ async function bookTicket(eventId, quantity, categoryName = null) {
     },
     body: JSON.stringify({
       event_id: eventId,
-      category_name: categoryName,  // Optional: e.g., "Early Bird", "VIP"
+      category_name: categoryName,  // Required: e.g., "Early Bird", "VIP" - events must have ticket categories
       quantity,
     }),
   });
@@ -2877,8 +3092,8 @@ export interface Event {
   event_name: string;
   event_location: string;
   event_date: string;
-  event_price: number;
   event_image: string | null; // Cloudinary CDN URL
+  // Note: event_price removed - prices are now at ticket category level
   event_type: string;
   pricing_type: 'free' | 'paid';
 }
@@ -4645,10 +4860,7 @@ await toggleUserStatus('organiser:ABC12-XYZ34', 'organizer', false);
 await toggleUserStatus('organiser:ABC12-XYZ34', 'organizer', true);
 ```
 
-**Query Parameters:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `role` | string | Yes | User role: `student` or `organizer` |
+---
 
 ### 10. Verify/Unverify Organizer
 
@@ -4719,7 +4931,7 @@ async function toggleOrganizerVerification(organiserId, isVerified) {
 await toggleOrganizerVerification('organiser:ABC12-XYZ34', true);
 ```
 
-**Description:** Mark an organizer as verified (trusted) or unverified. Verified organizers display a verification badge.
+---
 
 ### 11. Delete User
 
@@ -5676,6 +5888,7 @@ const organizers = await getUsers({ role: 'organizer' });
 | POST | `/logout/` | No | Logout |
 | POST | `/token/refresh/` | No | Refresh access token |
 | POST | `/change-password/` | Yes | Change password |
+| POST | `/student/google-signup/` | No | Google sign up (student) |
 | POST | `/organizer/google-signup/` | No | Google sign up (organizer) |
 | **Password Reset** |
 | POST | `/password-reset/request/` | No | Request password reset OTP |
@@ -5850,10 +6063,7 @@ const organizers = await getUsers({ role: 'organizer' });
 
 ---
 
-#### 5. **Serializer Architecture**
-- Serializers only validate data format
-- No business logic in serializers
-- Clean separation of concerns
+---
 
 ## Architecture Notes ✨ NEW
 
