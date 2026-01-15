@@ -196,7 +196,7 @@ const MyEvent = () => {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
            {[1, 2, 3, 4, 5, 6].map((i) => (
-               <div key={i} className="rounded-[2rem] overflow-hidden border border-white/5 bg-[#0A0A0A]">
+               <div key={i} className="rounded-4xl overflow-hidden border border-white/5 bg-[#0A0A0A]">
                   <Skeleton className="h-48 w-full" />
                   <div className="p-5 space-y-4">
                      <div className="space-y-2">

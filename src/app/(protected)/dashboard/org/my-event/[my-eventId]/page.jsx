@@ -260,7 +260,7 @@ export default function EventDetailsPage() {
         {/* Left Column - Image & Details */}
         <div className="lg:col-span-8 space-y-12">
           {/* Cover Image */}
-          <div className="relative aspect-[16/9] w-full rounded-[2.5rem] overflow-hidden group shadow-2xl">
+          <div className="relative aspect-video w-full rounded-[2.5rem] overflow-hidden group shadow-2xl">
             {showCover ? (
               <img
                 key={coverSrc}

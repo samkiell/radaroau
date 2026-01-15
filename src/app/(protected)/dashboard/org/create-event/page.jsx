@@ -24,6 +24,7 @@ import {
   Edit2,
   Zap,
 } from "lucide-react";
+import DateTimePicker from "@/components/ui/DateTimePicker";
 
 const FALLBACK_EVENT_TYPES = [
   { value: "conference", label: "Conference" },
@@ -542,11 +543,11 @@ export default function CreateEvent() {
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                   Date & Time <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  type="datetime-local"
-                  value={form.date}
-                  onChange={handleChange("date")}
-                  className={`w-full bg-white/5 border ${errors.date ? "border-rose-500/50 focus:border-rose-500" : "border-white/10 focus:border-rose-500"} rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-rose-500 transition-all [scheme:dark]`}
+                <DateTimePicker
+                  selected={form.date}
+                  onChange={(value) => setForm(prev => ({ ...prev, date: value }))}
+                  placeholder="Select event date and time"
+                  hasError={!!errors.date}
                 />
                 {errors.date && (
                   <p className="text-[10px] text-rose-500 font-bold">

@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { ChevronLeft, Save, Loader2 } from "lucide-react";
 import Loading from "@/components/ui/Loading";
 import { Skeleton } from "@/components/ui/skeleton";
+import DateTimePicker from "@/components/ui/DateTimePicker";
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -272,12 +273,11 @@ export default function EditEventPage() {
                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                   Date & Time <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  type="datetime-local"
-                  value={form.date}
-                  onChange={handleChange("date")}
-                  required
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-rose-500 transition-all [scheme:dark]"
+                <DateTimePicker
+                  selected={form.date}
+                  onChange={(value) => setForm(prev => ({ ...prev, date: value }))}
+                  placeholder="Select event date and time"
+                  minDate={null}
                 />
               </div>
             </div>
