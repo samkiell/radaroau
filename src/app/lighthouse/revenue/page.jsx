@@ -2,41 +2,100 @@
 
 import { useEffect, useState } from "react";
 import { adminService } from "../../../lib/admin";
-import { Loader2, DollarSign, Calendar, Users, BarChart3, CheckCircle, XCircle, Clock } from "lucide-react";
+import { DollarSign, Calendar, Users, TrendingUp, Clock, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import { AnalyticsSkeleton, TableSkeleton } from "@/components/skeletons";
+import { AdminDashboardSkeleton } from "@/components/skeletons";
+import { cn } from "@/lib/utils";
+
+function StatCard({ title, value, subtitle, icon: Icon }) {
+  return (
+    <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
+            <p className="text-2xl font-semibold tracking-tight text-foreground">{value}</p>
+            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          </div>
+          <div className="h-10 w-10 rounded-lg bg-muted/50 flex items-center justify-center">
+            <Icon className="h-5 w-5 text-muted-foreground" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatusBadge({ status }) {
+  const config = {
+    completed: { icon: CheckCircle, className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+    failed: { icon: XCircle, className: "bg-red-500/10 text-red-600 border-red-500/20" },
+    pending: { icon: Clock, className: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+  };
+  
+  const { icon: StatusIcon, className } = config[status] || config.pending;
+  
+  return (
+    <span className={cn(
+      "inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium uppercase tracking-wide border",
+      className
+    )}>
+      <StatusIcon className="w-3 h-3" />
+      {status}
+    </span>
+  );
+}
+
+function TabButton({ active, children, onClick, variant }) {
+  const variants = {
+    pending: "data-[active=true]:bg-amber-500 data-[active=true]:text-white",
+    completed: "data-[active=true]:bg-emerald-500 data-[active=true]:text-white",
+    failed: "data-[active=true]:bg-red-500 data-[active=true]:text-white",
+    default: "data-[active=true]:bg-foreground data-[active=true]:text-background",
+  };
+
+  return (
+    <button
+      data-active={active}
+      onClick={onClick}
+      className={cn(
+        "px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200",
+        "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+        variants[variant] || variants.default
+      )}
+    >
+      {children}
+    </button>
+  );
+}
 
 export default function RevenuePage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
-  const [withdrawalsLoading, setWithdrawalsLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState(null);
 
   useEffect(() => {
     Promise.all([
       adminService.getAnalytics(),
-      adminService.getAllWithdrawals({ page: 1, page_size: 100 })
+      adminService.getAllWithdrawals({ page: 1, page_size: 50 })
     ]).then(([analyticsData, withdrawalsData]) => {
       setStats(analyticsData);
       setWithdrawals(withdrawalsData.withdrawals || []);
       setLoading(false);
-      setWithdrawalsLoading(false);
     }).catch(() => {
       setLoading(false);
-      setWithdrawalsLoading(false);
     });
   }, []);
 
   if (loading) {
-    return <AnalyticsSkeleton />;
+    return <AdminDashboardSkeleton />;
   }
 
   const totalRevenue = stats?.total_revenue || 0;
   const totalEvents = stats?.total_events || 0;
   const totalOrganizers = stats?.total_organisers || 0;
   const totalStudents = stats?.total_students || 0;
-  const totalUsers = stats?.total_users || 0;
   
   const avgRevenuePerEvent = totalEvents > 0 ? (totalRevenue / totalEvents) : 0;
   const avgRevenuePerOrganizer = totalOrganizers > 0 ? (totalRevenue / totalOrganizers) : 0;
@@ -45,303 +104,181 @@ export default function RevenuePage() {
     ? withdrawals.filter(w => w.status === statusFilter)
     : withdrawals;
 
-  const getStatusIcon = (status) => {
-    switch(status) {
-      case 'completed': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'failed': return <XCircle className="h-4 w-4 text-red-500" />;
-      case 'pending': return <Clock className="h-4 w-4 text-yellow-500" />;
-      default: return <Clock className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    switch(status) {
-      case 'completed': return 'text-green-600 bg-green-50 border-green-200';
-      case 'failed': return 'text-red-600 bg-red-50 border-red-200';
-      case 'pending': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Revenue Analytics</h2>
-        <p className="text-muted-foreground text-sm mt-1">
-          Platform revenue and withdrawal transactions
-        </p>
-      </div>
-
-      {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₦{totalRevenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Platform fees collected
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalEvents}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Events on platform
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Organizers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalOrganizers}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Active organizers
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalStudents}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Registered students
-            </p>
-          </CardContent>
-        </Card>
+        <StatCard 
+          title="Total Revenue" 
+          value={`₦${totalRevenue.toLocaleString()}`} 
+          subtitle="Platform fees collected"
+          icon={DollarSign}
+        />
+        <StatCard 
+          title="Total Events" 
+          value={totalEvents} 
+          subtitle="Events on platform"
+          icon={Calendar}
+        />
+        <StatCard 
+          title="Organizers" 
+          value={totalOrganizers} 
+          subtitle="Active organizers"
+          icon={Users}
+        />
+        <StatCard 
+          title="Students" 
+          value={totalStudents} 
+          subtitle="Registered students"
+          icon={Users}
+        />
       </div>
 
-      {/* Detailed Breakdown */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Revenue Breakdown</CardTitle>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Revenue Breakdown</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b">
+            <div className="flex items-center justify-between py-3 border-b border-border/40">
               <div>
-                <p className="text-sm font-medium">Total Platform Revenue</p>
+                <p className="text-sm font-medium text-foreground">Total Platform Revenue</p>
                 <p className="text-xs text-muted-foreground">All-time earnings</p>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">₦{totalRevenue.toLocaleString()}</p>
-              </div>
+              <p className="text-lg font-semibold text-foreground">₦{totalRevenue.toLocaleString()}</p>
             </div>
-
-            <div className="flex items-center justify-between pb-3 border-b">
+            <div className="flex items-center justify-between py-3 border-b border-border/40">
               <div>
-                <p className="text-sm font-medium">Average per Event</p>
+                <p className="text-sm font-medium text-foreground">Average per Event</p>
                 <p className="text-xs text-muted-foreground">Revenue per event</p>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">
-                  ₦{avgRevenuePerEvent.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                </p>
-              </div>
+              <p className="text-lg font-semibold text-foreground">
+                ₦{avgRevenuePerEvent.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </p>
             </div>
-
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between py-3">
               <div>
-                <p className="text-sm font-medium">Average per Organizer</p>
+                <p className="text-sm font-medium text-foreground">Average per Organizer</p>
                 <p className="text-xs text-muted-foreground">Revenue per organizer</p>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">
-                  ₦{avgRevenuePerOrganizer.toLocaleString(undefined, { maximumFractionDigits: 2 })}
-                </p>
-              </div>
+              <p className="text-lg font-semibold text-foreground">
+                ₦{avgRevenuePerOrganizer.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Platform Statistics</CardTitle>
+        <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium">Platform Statistics</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b">
-              <div>
-                <p className="text-sm font-medium">Total Users</p>
-                <p className="text-xs text-muted-foreground">All registered users</p>
+            <div className="flex items-center justify-between py-3 border-b border-border/40">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-muted/50 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Total Users</p>
+                  <p className="text-xs text-muted-foreground">All registered users</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">{totalUsers}</p>
-              </div>
+              <p className="text-lg font-semibold text-foreground">{totalStudents + totalOrganizers}</p>
             </div>
-
-            <div className="flex items-center justify-between pb-3 border-b">
-              <div>
-                <p className="text-sm font-medium">Students</p>
-                <p className="text-xs text-muted-foreground">Student accounts</p>
+            <div className="flex items-center justify-between py-3 border-b border-border/40">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-blue-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Students</p>
+                  <p className="text-xs text-muted-foreground">Student accounts</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">{totalStudents}</p>
-              </div>
+              <p className="text-lg font-semibold text-foreground">{totalStudents}</p>
             </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Organizers</p>
-                <p className="text-xs text-muted-foreground">Event organizers</p>
+            <div className="flex items-center justify-between py-3">
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-violet-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Organizers</p>
+                  <p className="text-xs text-muted-foreground">Event organizers</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">{totalOrganizers}</p>
-              </div>
+              <p className="text-lg font-semibold text-foreground">{totalOrganizers}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Withdrawal Transactions Table */}
-      <Card>
-        <CardHeader>
+      <Card className="border-border/40 bg-card/50 backdrop-blur-sm">
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle>Withdrawal Transactions</CardTitle>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setStatusFilter(null)}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  statusFilter === null 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
-                All Status
-              </button>
-              <button
-                onClick={() => setStatusFilter('pending')}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  statusFilter === 'pending' 
-                    ? 'bg-yellow-500 text-white' 
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
+            <CardTitle className="text-sm font-medium">Recent Withdrawals</CardTitle>
+            <div className="flex items-center gap-1 p-1 bg-muted/30 rounded-lg">
+              <TabButton active={statusFilter === null} onClick={() => setStatusFilter(null)}>
+                All
+              </TabButton>
+              <TabButton active={statusFilter === 'pending'} onClick={() => setStatusFilter('pending')} variant="pending">
                 Pending
-              </button>
-              <button
-                onClick={() => setStatusFilter('completed')}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  statusFilter === 'completed' 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
+              </TabButton>
+              <TabButton active={statusFilter === 'completed'} onClick={() => setStatusFilter('completed')} variant="completed">
                 Completed
-              </button>
-              <button
-                onClick={() => setStatusFilter('failed')}
-                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-                  statusFilter === 'failed' 
-                    ? 'bg-red-500 text-white' 
-                    : 'bg-secondary hover:bg-secondary/80'
-                }`}
-              >
+              </TabButton>
+              <TabButton active={statusFilter === 'failed'} onClick={() => setStatusFilter('failed')} variant="failed">
                 Failed
-              </button>
+              </TabButton>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          {withdrawalsLoading ? (
-            <TableSkeleton />
-          ) : filteredWithdrawals.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              No withdrawal transactions found
+        <CardContent className="pt-0">
+          {filteredWithdrawals.length === 0 ? (
+            <div className="py-12 text-center">
+              <DollarSign className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
+              <p className="text-sm text-muted-foreground">No withdrawals found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b text-left">
-                    <th className="pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Transaction Details
-                    </th>
-                    <th className="pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Bank Details
-                    </th>
-                    <th className="pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Date
-                    </th>
+                  <tr className="border-b border-border/40">
+                    <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Transaction</th>
+                    <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">User</th>
+                    <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide hidden md:table-cell">Bank</th>
+                    <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Amount</th>
+                    <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Status</th>
+                    <th className="text-right pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide hidden lg:table-cell">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
-                  {filteredWithdrawals.map((withdrawal) => (
-                    <tr key={withdrawal.transaction_id} className="hover:bg-secondary/50 transition-colors">
-                      <td className="py-4">
-                        <div>
-                          <p className="font-mono text-sm font-medium text-primary">
-                            {withdrawal.transaction_id}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            Withdrawal request
-                          </p>
+                <tbody className="divide-y divide-border/40">
+                  {filteredWithdrawals.slice(0, 10).map((withdrawal) => (
+                    <tr key={withdrawal.transaction_id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-3">
+                        <p className="font-mono text-sm text-muted-foreground">{withdrawal.transaction_id}</p>
+                      </td>
+                      <td className="py-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate max-w-[120px]">{withdrawal.organiser_name}</p>
+                          <p className="text-xs text-muted-foreground truncate max-w-[120px]">{withdrawal.organiser_email}</p>
                         </div>
                       </td>
-                      <td className="py-4">
-                        <div>
-                          <p className="text-sm font-medium">{withdrawal.organiser_name}</p>
-                          <p className="text-xs text-muted-foreground">{withdrawal.organiser_email}</p>
-                        </div>
-                      </td>
-                      <td className="py-4">
-                        <p className="text-sm font-bold">₦{Number(withdrawal.amount).toLocaleString()}</p>
-                      </td>
-                      <td className="py-4">
-                        <div>
-                          <p className="text-sm font-medium">{withdrawal.bank_name}</p>
-                          <p className="text-xs text-muted-foreground">{withdrawal.account_number}</p>
+                      <td className="py-3 hidden md:table-cell">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground">{withdrawal.bank_name}</p>
                           <p className="text-xs text-muted-foreground">{withdrawal.account_name}</p>
                         </div>
                       </td>
-                      <td className="py-4">
-                        <div className="flex items-center gap-2">
-                          {getStatusIcon(withdrawal.status)}
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(withdrawal.status)}`}>
-                            {withdrawal.status.charAt(0).toUpperCase() + withdrawal.status.slice(1)}
-                          </span>
-                        </div>
+                      <td className="py-3">
+                        <p className="text-sm font-semibold text-foreground">₦{Number(withdrawal.amount).toLocaleString()}</p>
                       </td>
-                      <td className="py-4">
-                        <div>
-                          <p className="text-sm">
-                            {new Date(withdrawal.requested_at).toLocaleDateString('en-US', { 
-                              month: 'numeric', 
-                              day: 'numeric', 
-                              year: 'numeric' 
-                            })}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(withdrawal.requested_at).toLocaleTimeString('en-US', { 
-                              hour: '2-digit', 
-                              minute: '2-digit' 
-                            })}
-                          </p>
-                        </div>
+                      <td className="py-3">
+                        <StatusBadge status={withdrawal.status} />
+                      </td>
+                      <td className="py-3 text-right hidden lg:table-cell">
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(withdrawal.requested_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </p>
                       </td>
                     </tr>
                   ))}
