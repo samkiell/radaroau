@@ -2,25 +2,27 @@
 
 import Sidebar from '@/components/studentDashboardComponents/Sidebar'
 import { useRoleAuth } from '@/hooks/useRoleAuth'
-import { Loader2 } from 'lucide-react'
 import React from 'react'
 import Logo from '@/components/Logo'
+import { DashboardHeaderSkeleton, SidebarSkeleton, AnalyticsSkeleton } from "@/components/skeletons";
 
 const StudentDashboardLayout = ({children}) => {
   const { loading, authorized } = useRoleAuth('student');
 
-  if (loading) {
+  if (loading || !authorized) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <Loader2 className="h-10 w-10 animate-spin text-rose-500" />
-      </div>
-    );
-  }
-
-  if (!authorized) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <Loader2 className="h-10 w-10 animate-spin text-rose-500" />
+      <div className="min-h-screen bg-black">
+        <DashboardHeaderSkeleton />
+        <div className="flex">
+          <div className="hidden md:block w-64">
+            <SidebarSkeleton />
+          </div>
+          <main className="flex-1 p-4 md:p-8">
+            <div className="container mx-auto max-w-7xl">
+              <AnalyticsSkeleton />
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
