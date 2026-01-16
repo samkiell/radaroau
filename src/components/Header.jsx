@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import api from "@/lib/axios";
-import { Menu, X, User, LogOut, LayoutDashboard, Home, Calendar, Ticket } from "lucide-react";
+import { Menu, X, User, LogOut, LayoutDashboard, Home, Calendar, Ticket, Zap } from "lucide-react";
 import Logo from "./Logo";
 import { Button } from "./ui/button";
 import useAuthStore from "@/store/authStore";

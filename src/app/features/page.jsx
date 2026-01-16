@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   Zap, 
@@ -10,13 +11,101 @@ import {
   Ticket, 
   Smartphone, 
   Users, 
-  CreditCard, 
   QrCode,
   ArrowRight,
   Globe,
   Bell
 } from 'lucide-react';
 
+const FEATURE_GRID = [
+  {
+    icon: QrCode,
+    title: "Smart QR Ticketing",
+    description: "Instantly generated, encrypted QR codes for every ticket. Say goodbye to fraud and long queues with lightning-fast scanning.",
+    delay: 0.1
+  },
+  {
+    icon: BarChart3,
+    title: "Advanced Analytics",
+    description: "Track ticket sales, attendee demographics, and revenue in real-time. Make data-driven decisions to grow your audience.",
+    delay: 0.2
+  },
+  {
+    icon: ShieldCheck,
+    title: "Secure Payments",
+    description: "Enterprise-grade encryption for all transactions. We support various payment methods with instant payouts for organizers.",
+    delay: 0.3
+  },
+  {
+    icon: Users,
+    title: "Community Engine",
+    description: "Build a loyal following. Engage with your attendees through built-in messaging, newsletters, and social features.",
+    delay: 0.4
+  },
+  {
+    icon: Globe,
+    title: "Global Scale",
+    description: "Host events for 10 or 10,000 people. Our infrastructure scales automatically to handle high-demand ticket drops.",
+    delay: 0.5
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile First",
+    description: "Managing events on the go? Our organizer app gives you full control right from your pocket, anywhere in the world.",
+    delay: 0.6
+  }
+];
+
+const DETAILED_FEATURES = [
+  {
+    id: 'ticketing',
+    icon: Ticket,
+    color: 'blue',
+    title: 'Digital-First',
+    subtitle: 'Ticketing Evolution',
+    description: 'Experience the most seamless ticket purchasing flow ever created for the 2026 season. From discovery to checkout in under 30 seconds. Your tickets are stored securely in your Radar wallet and accessible offline.',
+    points: [
+      'Offline-ready digital tickets',
+      'Apple & Google Wallet integration',
+      'Dynamic pricing capabilities for 2026',
+      'One-click ticket transfers'
+    ],
+    image: '/assets/features/ticketing_v2.png',
+    reverse: false
+  },
+  {
+    id: 'analytics',
+    icon: BarChart3,
+    color: 'purple',
+    title: 'Organizer',
+    subtitle: 'Command Center',
+    description: 'Get a 360-degree view of your event performance in 2026. Our proprietary analytics engine processes thousands of data points to give you insights that actually matter for your growth.',
+    points: [
+      'Real-time revenue tracking',
+      'Heatmaps for attendee locations',
+      'Conversion rate optimization tools',
+      'Automated payout settlement'
+    ],
+    image: '/assets/features/analytics_v2.png',
+    reverse: true
+  },
+  {
+    id: 'discovery',
+    icon: Bell,
+    color: 'primary',
+    title: 'Stay in',
+    subtitle: 'The Loop',
+    description: 'Never miss an event you love in 2026. Our smart discovery engine learns your preferences and notifies you about upcoming shows, early-bird deals, and exclusive VIP access.',
+    points: [
+      'Personalized event feed',
+      'Push notifications for favorites',
+      'Waitlist for sold-out events',
+      'Exclusive member-only deals'
+    ],
+    image: '/assets/features/discovery_v2.png',
+    reverse: false
+  }
+];
 
 const FeatureCard = ({ icon: Icon, title, description, delay }) => (
   <motion.div
@@ -35,25 +124,8 @@ const FeatureCard = ({ icon: Icon, title, description, delay }) => (
 );
 
 const FeaturesPage = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30">
-
-
       <main className="pt-32 pb-20 overflow-hidden">
         {/* Hero Section */}
         <section className="container mx-auto px-6 mb-32 relative">
@@ -68,7 +140,7 @@ const FeaturesPage = () => {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary border border-border mb-8"
             >
               <Zap size={16} className="text-primary animate-pulse" />
-              <span className="text-sm font-medium">Revolutionizing Events</span>
+              <span className="text-sm font-medium">Radar 2026 Edition</span>
             </motion.div>
             
             <motion.h1
@@ -89,7 +161,7 @@ const FeaturesPage = () => {
               transition={{ duration: 0.7, delay: 0.4 }}
               className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed"
             >
-              Everything you need to host, manage, and attend world-class events. 
+              Everything you need to host, manage, and attend world-class events in 2026. 
               Built with cutting-edge technology for speed and security.
             </motion.p>
 
@@ -99,12 +171,16 @@ const FeaturesPage = () => {
               transition={{ duration: 0.7, delay: 0.6 }}
               className="flex flex-wrap justify-center gap-6"
             >
-              <button className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/20 flex items-center gap-2">
-                Get Started Free <ArrowRight size={20} />
-              </button>
-              <button className="px-8 py-4 bg-secondary text-foreground rounded-2xl font-bold hover:bg-secondary/80 transition-all border border-border">
-                Watch Demo
-              </button>
+              <Link href="/signup">
+                <button className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/20 flex items-center gap-2">
+                  Get Started Free <ArrowRight size={20} />
+                </button>
+              </Link>
+              <Link href="/events">
+                <button className="px-8 py-4 bg-secondary text-foreground rounded-2xl font-bold hover:bg-secondary/80 transition-all border border-border">
+                  Explore Events
+                </button>
+              </Link>
             </motion.div>
           </div>
         </section>
@@ -112,196 +188,67 @@ const FeaturesPage = () => {
         {/* Feature Grid */}
         <section className="container mx-auto px-6 mb-40">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard 
-              icon={QrCode}
-              title="Smart QR Ticketing"
-              description="Instantly generated, encrypted QR codes for every ticket. Say goodbye to fraud and long queues with lightning-fast scanning."
-              delay={0.1}
-            />
-            <FeatureCard 
-              icon={BarChart3}
-              title="Advanced Analytics"
-              description="Track ticket sales, attendee demographics, and revenue in real-time. Make data-driven decisions to grow your audience."
-              delay={0.2}
-            />
-            <FeatureCard 
-              icon={ShieldCheck}
-              title="Secure Payments"
-              description="Enterprise-grade encryption for all transactions. We support various payment methods with instant payouts for organizers."
-              delay={0.3}
-            />
-            <FeatureCard 
-              icon={Users}
-              title="Community Engine"
-              description="Build a loyal following. Engage with your attendees through built-in messaging, newsletters, and social features."
-              delay={0.4}
-            />
-            <FeatureCard 
-              icon={Globe}
-              title="Global Scale"
-              description="Host events for 10 or 10,000 people. Our infrastructure scales automatically to handle high-demand ticket drops."
-              delay={0.5}
-            />
-            <FeatureCard 
-              icon={Smartphone}
-              title="Mobile First"
-              description="Managing events on the go? Our organizer app gives you full control right from your pocket, anywhere in the world."
-              delay={0.6}
-            />
+            {FEATURE_GRID.map((feature, index) => (
+              <FeatureCard key={index} {...feature} />
+            ))}
           </div>
         </section>
 
         {/* Highlight Sections */}
         <section className="container mx-auto px-6 mb-40">
-          {/* Feature 1 */}
-          <div className="flex flex-col lg:flex-row items-center gap-16 mb-40">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex-1 space-y-8"
+          {DETAILED_FEATURES.map((feature) => (
+            <div 
+              key={feature.id}
+              className={`flex flex-col lg:flex-row ${feature.reverse ? 'lg:flex-row-reverse' : ''} items-center gap-16 mb-40 last:mb-0`}
             >
-              <div className="inline-block p-3 rounded-2xl bg-blue-500/10 text-blue-500">
-                <Ticket size={32} />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black">Digital-First <br /><span className="text-blue-500">Ticketing Evolution</span></h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Experience the most seamless ticket purchasing flow ever created. From discovery to checkout in under 30 seconds. Your tickets are stored securely in your Radar wallet and accessible offline.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Offline-ready digital tickets',
-                  'Apple & Google Wallet integration',
-                  'Dynamic pricing capabilities',
-                  'One-click ticket transfers'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-foreground font-medium">
-                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                      <Zap size={12} className="text-blue-500" />
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="flex-1 relative"
-            >
-              <div className="absolute inset-0 bg-blue-500/20 blur-[100px] rounded-full -z-10" />
-              <div className="rounded-[40px] overflow-hidden border border-border shadow-2xl">
-                <Image 
-                  src="/assets/features/ticketing.png" 
-                  alt="Smart Ticketing" 
-                  width={800} 
-                  height={800} 
-                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="flex flex-col lg:flex-row-reverse items-center gap-16 mb-40">
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex-1 space-y-8"
-            >
-              <div className="inline-block p-3 rounded-2xl bg-purple-500/10 text-purple-500">
-                <BarChart3 size={32} />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black">Organizer <br /><span className="text-purple-500">Command Center</span></h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Get a 360-degree view of your event's performance. Our proprietary analytics engine processes thousands of data points to give you insights that actually matter.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Real-time revenue tracking',
-                  'Heatmaps for attendee locations',
-                  'Conversion rate optimization tools',
-                  'Automated payout settlement'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-foreground font-medium">
-                    <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
-                      <Zap size={12} className="text-purple-500" />
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="flex-1 relative"
-            >
-              <div className="absolute inset-0 bg-purple-500/20 blur-[100px] rounded-full -z-10" />
-              <div className="rounded-[40px] overflow-hidden border border-border shadow-2xl">
-                <Image 
-                  src="/assets/features/analytics.png" 
-                  alt="Analytics Dashboard" 
-                  width={800} 
-                  height={800} 
-                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <motion.div 
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex-1 space-y-8"
-            >
-              <div className="inline-block p-3 rounded-2xl bg-primary/10 text-primary">
-                <Bell size={32} />
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black">Stay in <br /><span className="text-primary">The Loop</span></h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Never miss an event you love. Our smart discovery engine learns your preferences and notifies you about upcoming shows, early-bird deals, and exclusive VIP access.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Personalized event feed',
-                  'Push notifications for favorites',
-                  'Waitlist for sold-out events',
-                  'Exclusive member-only deals'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-foreground font-medium">
-                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Zap size={12} className="text-primary" />
-                    </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="flex-1 relative"
-            >
-              <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full -z-10" />
-              <div className="rounded-[40px] overflow-hidden border border-border shadow-2xl">
-                <Image 
-                  src="/assets/features/discovery.png" 
-                  alt="Event Discovery" 
-                  width={800} 
-                  height={800} 
-                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
-                />
-              </div>
-            </motion.div>
-          </div>
+              <motion.div 
+                initial={{ opacity: 0, x: feature.reverse ? 50 : -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="flex-1 space-y-8"
+              >
+                <div className={`inline-block p-3 rounded-2xl bg-${feature.color}-500/10 text-${feature.color}-500`}>
+                  <feature.icon size={32} className={feature.color === 'primary' ? 'text-primary' : ''} />
+                </div>
+                <h2 className="text-4xl md:text-5xl font-black">
+                  {feature.title} <br />
+                  <span className={feature.color === 'primary' ? 'text-primary' : `text-${feature.color}-500`}>
+                    {feature.subtitle}
+                  </span>
+                </h2>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  {feature.description}
+                </p>
+                <ul className="space-y-4">
+                  {feature.points.map((point, i) => (
+                    <li key={i} className="flex items-center gap-3 text-foreground font-medium">
+                      <div className={`w-6 h-6 rounded-full bg-${feature.color}-500/20 flex items-center justify-center`}>
+                        <Zap size={12} className={feature.color === 'primary' ? 'text-primary' : `text-${feature.color}-500`} />
+                      </div>
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="flex-1 relative"
+              >
+                <div className={`absolute inset-0 bg-${feature.color}-500/20 blur-[100px] rounded-full -z-10`} />
+                <div className="rounded-[40px] overflow-hidden border border-border shadow-2xl bg-secondary/20">
+                  <Image 
+                    src={feature.image} 
+                    alt={feature.title} 
+                    width={800} 
+                    height={800} 
+                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
+                  />
+                </div>
+              </motion.div>
+            </div>
+          ))}
         </section>
 
         {/* CTA Section */}
@@ -315,23 +262,25 @@ const FeaturesPage = () => {
             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 blur-[100px] rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-60 h-60 bg-black/20 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2" />
             
-            <h2 className="text-4xl md:text-6xl font-black mb-8 relative z-10">Ready to Upgrade Your Events?</h2>
+            <h2 className="text-4xl md:text-6xl font-black mb-8 relative z-10">Start Your 2026 Season Today</h2>
             <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto relative z-10">
-              Join thousands of organizers and attendees already using Radar to power their experiences.
+              Join thousands of organizers and attendees already using Radar to power their experiences in 2026.
             </p>
             <div className="flex flex-wrap justify-center gap-6 relative z-10">
-              <button className="px-10 py-5 bg-white text-primary rounded-2xl font-black hover:bg-white/90 transition-all hover:scale-105 shadow-xl">
-                Create Your Account
-              </button>
-              <button className="px-10 py-5 bg-black/20 text-white rounded-2xl font-black hover:bg-black/30 transition-all border border-white/20">
-                Contact Sales
-              </button>
+              <Link href="/signup">
+                <button className="px-10 py-5 bg-white text-primary rounded-2xl font-black hover:bg-white/90 transition-all hover:scale-105 shadow-xl">
+                  Create Your Account
+                </button>
+              </Link>
+              <Link href="/contact">
+                <button className="px-10 py-5 bg-black/20 text-white rounded-2xl font-black hover:bg-black/30 transition-all border border-white/20">
+                  Contact Sales
+                </button>
+              </Link>
             </div>
           </motion.div>
         </section>
       </main>
-
-
     </div>
   );
 };
