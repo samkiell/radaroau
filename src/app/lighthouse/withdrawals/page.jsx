@@ -6,6 +6,7 @@ import { adminService } from "@/lib/admin";
 import { toast } from "react-hot-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TableSkeleton } from "@/components/skeletons";
 
 export default function WithdrawalsPage() {
   const [loading, setLoading] = useState(true);
