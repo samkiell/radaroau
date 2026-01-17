@@ -114,7 +114,8 @@ export default function RevenuePage() {
   const [transactions, setTransactions] = useState([]);
   const [withdrawalFilter, setWithdrawalFilter] = useState(null);
   const [transactionFilter, setTransactionFilter] = useState(null);
-  const [activeTab, setActiveTab] = useState('transactions'); // 'transactions' or 'withdrawals'
+  const [activeTab, setActiveTab] = useState('withdrawals'); // 'transactions' or 'withdrawals' - default to withdrawals since payment-transactions may not be available
+  const [transactionsError, setTransactionsError] = useState(false);
   
   // Pagination for transactions
   const [currentPage, setCurrentPage] = useState(1);
@@ -126,29 +127,46 @@ export default function RevenuePage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'transactions') {
+    if (activeTab === 'transactions' && !transactionsError) {
       fetchTransactions();
     }
-  }, [currentPage, transactionFilter]);
+  }, [currentPage, transactionFilter, activeTab]);
 
   const fetchData = async () => {
     setLoading(true);
-    try {
-      const [analyticsData, withdrawalsData, transactionsData] = await Promise.all([
-        adminService.getAnalytics(),
-        adminService.getAllWithdrawals({ page: 1, page_size: 50 }),
-        adminService.getPaymentTransactions({ limit: itemsPerPage, offset: 0 })
-      ]);
-      
-      setStats(analyticsData);
-      setWithdrawals(withdrawalsData.withdrawals || []);
-      setTransactions(transactionsData.transactions || []);
-      setTotalTransactions(transactionsData.total_count || 0);
-    } catch (error) {
-      console.error("Failed to fetch revenue data:", error);
-    } finally {
-      setLoading(false);
+    
+    // Use Promise.allSettled to handle partial failures gracefully
+    const results = await Promise.allSettled([
+      adminService.getAnalytics(),
+      adminService.getAllWithdrawals({ page: 1, page_size: 50 }),
+      adminService.getPaymentTransactions({ limit: itemsPerPage, offset: 0 })
+    ]);
+    
+    // Handle analytics result
+    if (results[0].status === 'fulfilled') {
+      setStats(results[0].value);
+    } else {
+      console.error("Failed to fetch analytics:", results[0].reason);
     }
+    
+    // Handle withdrawals result
+    if (results[1].status === 'fulfilled') {
+      setWithdrawals(results[1].value?.withdrawals || []);
+    } else {
+      console.error("Failed to fetch withdrawals:", results[1].reason);
+    }
+    
+    // Handle transactions result
+    if (results[2].status === 'fulfilled') {
+      setTransactions(results[2].value?.transactions || []);
+      setTotalTransactions(results[2].value?.total_count || 0);
+      setTransactionsError(false);
+    } else {
+      console.error("Failed to fetch transactions:", results[2].reason);
+      setTransactionsError(true);
+    }
+    
+    setLoading(false);
   };
 
   const fetchTransactions = async () => {
@@ -162,8 +180,10 @@ export default function RevenuePage() {
       const data = await adminService.getPaymentTransactions(params);
       setTransactions(data.transactions || []);
       setTotalTransactions(data.total_count || 0);
+      setTransactionsError(false);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
+      setTransactionsError(true);
     }
   };
 
@@ -351,7 +371,26 @@ export default function RevenuePage() {
           {activeTab === 'transactions' ? (
             /* Payment Transactions Table */
             <>
-              {transactions.length === 0 ? (
+              {transactionsError ? (
+                <div className="py-12 text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/10 mb-3">
+                    <Receipt className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <p className="text-sm font-medium text-foreground mb-1">Payment Transactions Unavailable</p>
+                  <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                    The payment transactions endpoint is currently experiencing issues. 
+                    Please check back later or contact the backend team.
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-4"
+                    onClick={() => setActiveTab('withdrawals')}
+                  >
+                    View Withdrawals Instead
+                  </Button>
+                </div>
+              ) : transactions.length === 0 ? (
                 <div className="py-12 text-center">
                   <Receipt className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
                   <p className="text-sm text-muted-foreground">No transactions found</p>
