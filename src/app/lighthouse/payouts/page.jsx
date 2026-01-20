@@ -334,7 +334,6 @@ export default function PayoutsPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border/40">
-                    <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Request ID</th>
                     <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Organizer</th>
                     <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide hidden md:table-cell">Bank Details</th>
                     <th className="text-left pb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">Amount</th>
@@ -347,11 +346,6 @@ export default function PayoutsPage() {
                 <tbody className="divide-y divide-border/40">
                   {payoutRequests.map((request) => (
                     <tr key={request.request_id} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-3">
-                        <p className="font-mono text-xs text-foreground truncate max-w-[100px]" title={request.request_id}>
-                          {request.request_id?.slice(-12) || '—'}
-                        </p>
-                      </td>
                       <td className="py-3">
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground truncate max-w-[120px]">{request.organizer_name || '—'}</p>
